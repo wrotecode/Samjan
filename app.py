@@ -2,51 +2,132 @@ import os
 import io
 import json
 import re
+import time
+import sqlite3
 from pathlib import Path
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify, Response
+from flask import Flask, render_template, request, jsonify, Response, session
 from google import genai
 from PIL import Image, ImageDraw
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv(Path(__file__).with_name(".env"))
 
 MODEL = os.environ.get("GEMMA_MODEL", "models/gemma-4-26b-a4b-it")
 API_KEY = os.environ.get("GEMINI_API_KEY")
 SKILL = Path(__file__).with_name("skills.md").read_text(encoding="utf-8")
+DB_PATH = Path(__file__).with_name("samjan.db")
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "samjan-session-secret-key-39184")
+
+
+# ── database setup ─────────────────────────────────────────────────────────────
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    with get_db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS documents (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                doc_type TEXT,
+                amount TEXT,
+                deadline TEXT,
+                deadline_display TEXT,
+                scam_risk TEXT,
+                scam_reasons TEXT,
+                explanation TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            );
+        """)
+        conn.commit()
+
+
+init_db()
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
 
-def _call_model(contents: list) -> str:
+def _call_model(contents: list, retries: int = 3) -> str:
+    """Call Gemma 4 model with automatic retry on transient Google 500/503 errors."""
     client = genai.Client(api_key=API_KEY)
-    resp = client.models.generate_content(model=MODEL, contents=contents)
-    return resp.text or ""
+    last_err = None
+    for attempt in range(1, retries + 1):
+        try:
+            resp = client.models.generate_content(model=MODEL, contents=contents)
+            return resp.text or ""
+        except Exception as e:
+            last_err = e
+            err_str = str(e)
+            if attempt < retries and ("500" in err_str or "503" in err_str or "INTERNAL" in err_str):
+                time.sleep(1.5 * attempt)
+                continue
+            raise last_err
 
 
 def _parse_structured(raw: str) -> dict:
     """Extract a JSON object from the model response robustly."""
-    # Strip markdown fences if present
     clean = re.sub(r"```(?:json)?", "", raw).strip().strip("`").strip()
-    # Find the outermost { … }
     start = clean.find("{")
     end = clean.rfind("}") + 1
+    parsed = {}
     if start != -1 and end > start:
         try:
-            return json.loads(clean[start:end])
+            parsed = json.loads(clean[start:end])
         except json.JSONDecodeError:
             pass
-    # Fallback: return raw text as explanation only
+
+    if isinstance(parsed, dict) and parsed:
+        doc_type = parsed.get("type") or parsed.get("document_type") or parsed.get("title") or "Document"
+        amount = parsed.get("amount") or parsed.get("amount_due") or parsed.get("total") or "N/A"
+        deadline = parsed.get("deadline") or parsed.get("due_date") or "N/A"
+        deadline_display = parsed.get("deadline_display") or deadline
+        scam_risk = parsed.get("scam_risk") or parsed.get("risk") or "low"
+        scam_reasons = parsed.get("scam_reasons") or parsed.get("reasons") or []
+        if isinstance(scam_reasons, str):
+            scam_reasons = [scam_reasons]
+        
+        explanation = parsed.get("explanation")
+        if not explanation:
+            # Reconstruct explanation from keys if model split them
+            explanation = "\n\n".join(f"**{k}:**\n{v}" for k, v in parsed.items() if k not in ["type", "amount", "deadline", "deadline_display", "scam_risk", "scam_reasons"])
+        if not explanation:
+            explanation = raw
+
+        return {
+            "type": doc_type,
+            "amount": amount,
+            "deadline": deadline,
+            "deadline_display": deadline_display,
+            "scam_risk": scam_risk,
+            "scam_reasons": scam_reasons,
+            "explanation": explanation,
+        }
+
     return {
-        "type": "Unknown",
+        "type": "Document",
         "amount": "N/A",
         "deadline": "N/A",
         "deadline_display": "N/A",
         "scam_risk": "low",
-        "scam_reasons": ["Could not parse structured response."],
+        "scam_reasons": ["Automated format fallback"],
         "explanation": raw,
     }
 
@@ -75,7 +156,155 @@ def _make_sample_img() -> Image.Image:
     return img
 
 
-# ── routes ─────────────────────────────────────────────────────────────────────
+# ── auth routes ────────────────────────────────────────────────────────────────
+
+@app.route("/auth/me")
+def auth_me():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"logged_in": False})
+    return jsonify({
+        "logged_in": True,
+        "user": {"id": user_id, "username": session.get("username")}
+    })
+
+
+@app.route("/auth/register", methods=["POST"])
+def auth_register():
+    data = request.get_json() or {}
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
+
+    if not username or len(username) < 3:
+        return jsonify({"error": "Username must be at least 3 characters."}), 400
+    if not password or len(password) < 4:
+        return jsonify({"error": "Password must be at least 4 characters."}), 400
+
+    hashed = generate_password_hash(password)
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+                (username, hashed),
+            )
+            conn.commit()
+            user_id = cursor.lastrowid
+            session["user_id"] = user_id
+            session["username"] = username
+            return jsonify({"success": True, "user": {"id": user_id, "username": username}})
+    except sqlite3.IntegrityError:
+        return jsonify({"error": "That username is already taken. Try another."}), 400
+
+
+@app.route("/auth/login", methods=["POST"])
+def auth_login():
+    data = request.get_json() or {}
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
+
+    if not username or not password:
+        return jsonify({"error": "Please enter both username and password."}), 400
+
+    with get_db() as conn:
+        user = conn.execute(
+            "SELECT id, username, password_hash FROM users WHERE username = ?",
+            (username,),
+        ).fetchone()
+
+    if not user or not check_password_hash(user["password_hash"], password):
+        return jsonify({"error": "Invalid username or password."}), 401
+
+    session["user_id"] = user["id"]
+    session["username"] = user["username"]
+    return jsonify({"success": True, "user": {"id": user["id"], "username": user["username"]}})
+
+
+@app.route("/auth/logout", methods=["POST"])
+def auth_logout():
+    session.clear()
+    return jsonify({"success": True})
+
+
+# ── document history routes ────────────────────────────────────────────────────
+
+@app.route("/history", methods=["GET"])
+def get_history():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Please sign in to view your saved history."}), 401
+
+    with get_db() as conn:
+        rows = conn.execute("""
+            SELECT id, doc_type, amount, deadline, deadline_display, scam_risk, created_at
+            FROM documents
+            WHERE user_id = ?
+            ORDER BY id DESC
+        """, (user_id,)).fetchall()
+
+    items = [
+        {
+            "id": r["id"],
+            "doc_type": r["doc_type"],
+            "amount": r["amount"],
+            "deadline": r["deadline"],
+            "deadline_display": r["deadline_display"],
+            "scam_risk": r["scam_risk"],
+            "created_at": r["created_at"],
+        }
+        for r in rows
+    ]
+    return jsonify({"documents": items})
+
+
+@app.route("/history/<int:doc_id>", methods=["GET"])
+def get_history_item(doc_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Please sign in."}), 401
+
+    with get_db() as conn:
+        row = conn.execute("""
+            SELECT id, doc_type, amount, deadline, deadline_display, scam_risk, scam_reasons, explanation, created_at
+            FROM documents
+            WHERE id = ? AND user_id = ?
+        """, (doc_id, user_id)).fetchone()
+
+    if not row:
+        return jsonify({"error": "Document not found."}), 404
+
+    try:
+        reasons = json.loads(row["scam_reasons"]) if row["scam_reasons"] else []
+    except Exception:
+        reasons = []
+
+    return jsonify({
+        "id": row["id"],
+        "type": row["doc_type"],
+        "amount": row["amount"],
+        "deadline": row["deadline"],
+        "deadline_display": row["deadline_display"],
+        "scam_risk": row["scam_risk"],
+        "scam_reasons": reasons,
+        "explanation": row["explanation"],
+        "created_at": row["created_at"],
+    })
+
+
+@app.route("/history/<int:doc_id>", methods=["DELETE"])
+def delete_history_item(doc_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Please sign in."}), 401
+
+    with get_db() as conn:
+        conn.execute("DELETE FROM documents WHERE id = ? AND user_id = ?", (doc_id, user_id))
+        conn.commit()
+
+    return jsonify({"success": True})
+
+
+# ── core app routes ────────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
@@ -119,6 +348,30 @@ def explain():
     try:
         raw = _call_model([image, prompt])
         data = _parse_structured(raw)
+
+        # Save to database if user is logged in
+        user_id = session.get("user_id")
+        if user_id:
+            with get_db() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO documents (
+                        user_id, doc_type, amount, deadline, deadline_display,
+                        scam_risk, scam_reasons, explanation
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    user_id,
+                    data.get("type", "Document"),
+                    data.get("amount", "N/A"),
+                    data.get("deadline", "N/A"),
+                    data.get("deadline_display", "N/A"),
+                    data.get("scam_risk", "low"),
+                    json.dumps(data.get("scam_reasons", [])),
+                    data.get("explanation", ""),
+                ))
+                conn.commit()
+                data["saved_id"] = cursor.lastrowid
+
         return jsonify(data)
     except Exception as e:
         err = str(e)
@@ -126,6 +379,8 @@ def explain():
             return jsonify({"error": "Invalid API key. Check your .env file."}), 401
         if "429" in err or "quota" in err.lower():
             return jsonify({"error": "Rate limit reached. Wait a moment and try again."}), 429
+        if "500" in err or "INTERNAL" in err:
+            return jsonify({"error": "Google AI service had a temporary glitch. Please click 'Explain this document' again."}), 500
         return jsonify({"error": f"Something went wrong: {err}"}), 500
 
 
@@ -135,9 +390,9 @@ def chat():
     if not API_KEY:
         return jsonify({"error": "API key not set."}), 500
 
-    data = request.get_json()
+    data = request.get_json() or {}
     lang = data.get("lang", "English")
-    context = data.get("context", "")   # explanation text from first call
+    context = data.get("context", "")
     question = data.get("question", "").strip()
 
     if not question:
@@ -159,7 +414,7 @@ def chat():
 @app.route("/ics", methods=["POST"])
 def ics():
     """Return an .ics calendar file for the document deadline."""
-    data = request.get_json()
+    data = request.get_json() or {}
     deadline_str = data.get("deadline", "")
     doc_type = data.get("type", "Document")
     amount = data.get("amount", "")

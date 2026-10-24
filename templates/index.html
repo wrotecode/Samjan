@@ -3,217 +3,291 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samjan — Intelligent Document Explainer</title>
-  <meta name="description" content="Upload any bill, notice, or letter to get clear answers and scam protection in Gujarati, Hindi, or English. Powered by Gemma 4." />
+  <title>Samjan — Official Document Verification & Explanation</title>
+  <meta name="description" content="Verified explanation and fraud detection for letters, bills, and official notices in Gujarati, Hindi, and English. Powered by Gemma 4." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      --bg: #090b14;
-      --bg-card: rgba(18, 22, 38, 0.72);
-      --bg-card-hover: rgba(26, 31, 54, 0.82);
-      --surface-light: rgba(255, 255, 255, 0.035);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-focus: #6366f1;
-      --accent: #6366f1;
-      --accent-grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-      --accent-glow: rgba(99, 102, 241, 0.25);
-      --cyan: #06b6d4;
-      --cyan-glow: rgba(6, 182, 212, 0.25);
+      /* Banham-inspired Authority & Security Palette */
+      --bg-deep: #0a0e17;
+      --bg-surface: #101623;
+      --bg-surface-elevated: #161e2e;
+      --border-subtle: #1e293b;
+      --border-strong: #334155;
+      
+      /* Signature Banham Gold & Accents - Zero Purple */
+      --gold: #f59e0b;
+      --gold-hover: #d97706;
+      --gold-muted: rgba(245, 158, 11, 0.12);
+      --gold-border: rgba(245, 158, 11, 0.35);
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
       --emerald: #10b981;
+      --emerald-bg: rgba(16, 185, 129, 0.1);
+      --emerald-border: rgba(16, 185, 129, 0.28);
+      
       --amber: #f59e0b;
-      --rose: #f43f5e;
-      --text: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --radius-full: 9999px;
-      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
-      --shadow-lg: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
-      --shadow-glow: 0 0 35px -5px rgba(99, 102, 241, 0.25);
+      --amber-bg: rgba(245, 158, 11, 0.1);
+      --amber-border: rgba(245, 158, 11, 0.3);
+      
+      --crimson: #ef4444;
+      --crimson-bg: rgba(239, 68, 68, 0.12);
+      --crimson-border: rgba(239, 68, 68, 0.35);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      
+      --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
     }
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: var(--bg-deep);
+      color: var(--text-main);
       min-height: 100vh;
       line-height: 1.6;
-      padding: 1.5rem 1rem 5rem;
+      padding: 0 0 5rem;
       position: relative;
-      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient dynamic backdrop glow */
-    body::before {
-      content: "";
-      position: fixed;
-      top: -20%;
-      left: 10%;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
-      filter: blur(80px);
-      z-index: -1;
-      pointer-events: none;
-      animation: floatOrb 18s ease-in-out infinite alternate;
+    /* ── Top Security Header Bar ── */
+    .site-nav {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.9rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
-    body::after {
-      content: "";
-      position: fixed;
-      bottom: -15%;
-      right: 10%;
-      width: 550px;
-      height: 550px;
-      background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
-      filter: blur(80px);
-      z-index: -1;
-      pointer-events: none;
-      animation: floatOrb2 22s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatOrb {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(40px, 60px) scale(1.15); }
-    }
-
-    @keyframes floatOrb2 {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(-50px, -40px) scale(1.2); }
-    }
-
-    .container {
-      max-width: 720px;
+    .nav-inner {
+      max-width: 760px;
       margin: 0 auto;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    /* ── Header ── */
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-      position: relative;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-main);
     }
 
-    .brand-badge {
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--gold);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0a0e17;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.05em;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .brand-subtitle {
+      font-size: 0.72rem;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-left: 1px solid var(--border-strong);
+      padding-left: 0.5rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .nav-btn {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0.9rem;
-      border-radius: var(--radius-full);
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      color: #c7d2fe;
-      font-size: 0.75rem;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .nav-btn:hover {
+      background: var(--border-subtle);
+      border-color: var(--gold);
+    }
+
+    .nav-btn-gold {
+      background: var(--gold);
+      color: #0a0e17;
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+
+    .nav-btn-gold:hover {
+      background: var(--gold-hover);
+      color: #0a0e17;
+      border-color: var(--gold-hover);
+    }
+
+    .user-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.82rem;
       font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+      color: var(--text-main);
     }
 
-    .brand-badge .pulse-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #818cf8;
-      box-shadow: 0 0 8px #818cf8;
-      animation: pulse 2s infinite;
-    }
-
-    header h1 {
-      font-size: 2.8rem;
+    .count-tag {
+      background: var(--gold);
+      color: #0a0e17;
+      padding: 0.05rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 0.6rem;
-      background: linear-gradient(135deg, #ffffff 15%, #cbd5e1 50%, #93c5fd 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
 
-    header h1 .accent-word {
-      background: var(--accent-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    /* ── Main Container ── */
+    .container {
+      max-width: 760px;
+      margin: 2.2rem auto 0;
+      padding: 0 1rem;
     }
 
-    header p {
-      color: var(--text-secondary);
-      font-size: 1.02rem;
-      max-width: 520px;
-      margin: 0 auto;
-      font-weight: 400;
+    /* ── Editorial Hero ── */
+    .hero-panel {
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 1.75rem;
+      margin-bottom: 2rem;
     }
 
-    /* ── Glass Card ── */
+    .hero-kicker {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-panel h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: #ffffff;
+      margin-bottom: 0.65rem;
+    }
+
+    .hero-panel p {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      line-height: 1.6;
+    }
+
+    /* ── Standard Solid Card ── */
     .card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
       padding: 1.85rem;
-      margin-bottom: 1.35rem;
-      box-shadow: var(--shadow-lg);
-      transition: border-color 0.25s, box-shadow 0.25s;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-card);
     }
 
-    .card:hover {
-      border-color: rgba(255, 255, 255, 0.12);
+    .card-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.85rem;
+      margin-bottom: 1.35rem;
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
     }
 
     /* ── Form Controls ── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.35rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; gap: 1rem; }
+    }
+
     .form-group {
       margin-bottom: 1.25rem;
     }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    @media (max-width: 600px) {
-      .form-row { grid-template-columns: 1fr; }
-    }
-
     label {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
+      display: block;
       font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-secondary);
+      font-weight: 700;
+      color: var(--text-muted);
       margin-bottom: 0.45rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
 
-    select, input[type="text"] {
+    select, input[type="text"], input[type="password"] {
       width: 100%;
-      background: rgba(14, 17, 30, 0.85);
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      color: var(--text);
-      padding: 0.75rem 1rem;
-      font-size: 0.95rem;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      padding: 0.75rem 0.95rem;
+      font-size: 0.92rem;
       font-family: inherit;
       outline: none;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: border-color 0.15s ease;
     }
 
-    select:focus, input[type="text"]:focus {
-      border-color: var(--border-focus);
-      background: rgba(19, 23, 42, 0.95);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+    select:focus, input[type="text"]:focus, input[type="password"]:focus {
+      border-color: var(--gold);
     }
 
     select {
@@ -221,55 +295,26 @@
       appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
-      background-position: right 1rem center;
+      background-position: right 0.95rem center;
       background-size: 1rem;
       padding-right: 2.5rem;
     }
 
-    /* Suggestion Chips */
-    .chip-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      margin-top: 0.5rem;
-    }
-
-    .chip {
-      font-size: 0.76rem;
-      padding: 0.25rem 0.65rem;
-      border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s ease;
-      user-select: none;
-    }
-
-    .chip:hover {
-      background: rgba(99, 102, 241, 0.15);
-      border-color: rgba(99, 102, 241, 0.3);
-      color: #e0e7ff;
-      transform: translateY(-1px);
-    }
-
     /* ── Drop Zone ── */
     .drop-zone {
-      border: 2px dashed rgba(255, 255, 255, 0.14);
-      border-radius: var(--radius-md);
-      padding: 2.2rem 1.25rem;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 2.25rem 1.5rem;
       text-align: center;
       cursor: pointer;
       position: relative;
-      background: rgba(14, 18, 32, 0.4);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
+      background: var(--bg-surface-elevated);
+      transition: border-color 0.15s ease, background-color 0.15s ease;
     }
 
     .drop-zone:hover, .drop-zone.drag-over {
-      border-color: #818cf8;
-      background: rgba(99, 102, 241, 0.08);
-      box-shadow: 0 0 25px rgba(99, 102, 241, 0.12);
+      border-color: var(--gold);
+      background: rgba(245, 158, 11, 0.03);
     }
 
     .drop-zone input[type="file"] {
@@ -282,180 +327,137 @@
       z-index: 2;
     }
 
-    .drop-icon-wrap {
-      width: 52px;
-      height: 52px;
-      margin: 0 auto 0.85rem;
-      border-radius: 50%;
-      background: rgba(99, 102, 241, 0.12);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #818cf8;
+    .drop-icon {
       font-size: 1.5rem;
-      transition: transform 0.2s ease;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
     }
 
-    .drop-zone:hover .drop-icon-wrap {
-      transform: scale(1.1);
-    }
-
-    .drop-primary-text {
+    .drop-title {
       font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
+      font-weight: 700;
+      color: var(--text-main);
       margin-bottom: 0.25rem;
     }
 
-    .drop-subtext {
+    .drop-hint {
       font-size: 0.8rem;
-      color: var(--text-muted);
+      color: var(--text-dim);
     }
 
     .file-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      margin-top: 0.65rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: var(--radius-full);
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #6ee7b7;
-      font-size: 0.8rem;
-      font-weight: 500;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-size: 0.82rem;
+      font-weight: 600;
     }
 
-    /* ── Preview with Scanner Effect ── */
+    /* ── Preview Container ── */
     #preview-wrap {
       display: none;
       position: relative;
       margin-bottom: 1.25rem;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-strong);
       background: #000;
     }
 
     #preview-wrap img {
       width: 100%;
       display: block;
-      max-height: 380px;
+      max-height: 400px;
       object-fit: contain;
-      background: #0a0c16;
-    }
-
-    /* Laser scan line active during loading */
-    .scan-line {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent);
-      box-shadow: 0 0 15px 3px rgba(56, 189, 248, 0.65);
-      z-index: 5;
-    }
-
-    .scanning .scan-line {
-      display: block;
-      animation: scanLaser 2s linear infinite;
-    }
-
-    @keyframes scanLaser {
-      0% { top: 0; opacity: 0.8; }
-      50% { top: 100%; opacity: 1; }
-      100% { top: 0; opacity: 0.8; }
+      background: #070a10;
     }
 
     .preview-clear-btn {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border);
-      color: var(--text);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 0.85rem;
       cursor: pointer;
-      backdrop-filter: blur(8px);
       transition: all 0.15s ease;
       z-index: 6;
     }
 
     .preview-clear-btn:hover {
-      background: rgba(244, 63, 94, 0.8);
-      border-color: var(--rose);
+      background: var(--crimson);
+      border-color: var(--crimson);
+      color: #fff;
     }
 
-    /* ── Buttons ── */
+    /* ── Primary Action Buttons ── */
     .btn {
       width: 100%;
-      padding: 0.88rem 1.4rem;
-      border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
+      padding: 0.9rem 1.4rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 700;
       font-family: inherit;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.6rem;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn:active {
-      transform: scale(0.985);
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .btn:disabled {
-      opacity: 0.5;
+      opacity: 0.45;
       cursor: not-allowed;
-      filter: grayscale(0.5);
     }
 
-    .btn-primary {
-      background: var(--accent-grad);
-      color: #ffffff;
-      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    .btn-gold {
+      background: var(--gold);
+      color: #0a0e17;
+      border: 1px solid var(--gold);
     }
 
-    .btn-primary:hover:not(:disabled) {
-      box-shadow: 0 6px 28px rgba(139, 92, 246, 0.5);
-      transform: translateY(-1px);
+    .btn-gold:hover:not(:disabled) {
+      background: var(--gold-hover);
+      border-color: var(--gold-hover);
     }
 
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
+    .btn-outline {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-strong);
       margin-top: 0.65rem;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
+      font-weight: 600;
       padding: 0.7rem;
     }
 
-    .btn-secondary:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-      border-color: rgba(255, 255, 255, 0.15);
+    .btn-outline:hover:not(:disabled) {
+      border-color: var(--text-muted);
+      color: var(--text-main);
     }
 
     .btn-action {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
       padding: 0.65rem 1rem;
-      color: var(--text);
+      color: var(--text-main);
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
@@ -468,10 +470,8 @@
     }
 
     .btn-action:hover:not(:disabled) {
-      background: rgba(99, 102, 241, 0.12);
-      border-color: rgba(99, 102, 241, 0.35);
+      border-color: var(--gold);
       color: #fff;
-      transform: translateY(-1px);
     }
 
     .btn-action:disabled {
@@ -479,211 +479,113 @@
       cursor: not-allowed;
     }
 
-    .btn-action.active {
-      background: rgba(244, 63, 94, 0.15);
-      border-color: rgba(244, 63, 94, 0.4);
-      color: #fda4af;
-    }
-
-    /* ── Dashboard Metric Cards ── */
-    .dash-grid {
+    /* ── Dashboard Metrics Grid ── */
+    .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.85rem;
-      margin-bottom: 1.25rem;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     @media (max-width: 580px) {
-      .dash-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr; }
     }
 
-    .dash-card {
-      background: rgba(14, 18, 34, 0.8);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.15rem 1rem;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.15rem;
+      border-left: 3px solid var(--gold);
     }
 
-    .dash-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .dash-card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: transparent;
-    }
-
-    .dash-card.type-card::before { background: linear-gradient(90deg, #6366f1, #a855f7); }
-    .dash-card.amount-card::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-    .dash-card.deadline-card::before { background: linear-gradient(90deg, #06b6d4, #38bdf8); }
-
-    .dash-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-    }
-
-    .dash-card .label {
+    .metric-label {
       font-size: 0.72rem;
-      color: var(--text-muted);
+      font-weight: 700;
+      color: var(--text-dim);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      font-weight: 600;
-    }
-
-    .dash-icon {
-      font-size: 1.05rem;
-    }
-
-    .dash-card .value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text);
-      word-break: break-word;
-      line-height: 1.3;
-    }
-
-    .dash-card .value.amount {
-      color: #fbbf24;
-      font-feature-settings: "tnum";
-    }
-
-    .dash-card .value.deadline {
-      color: #38bdf8;
-    }
-
-    /* ── Scam Risk Alert Box ── */
-    .scam-box {
-      border-radius: var(--radius-md);
-      padding: 1.2rem 1.35rem;
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(12px);
-    }
-
-    .scam-box.low {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.28);
-    }
-
-    .scam-box.medium {
-      background: rgba(245, 158, 11, 0.09);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-
-    .scam-box.high {
-      background: rgba(244, 63, 94, 0.12);
-      border: 1px solid rgba(244, 63, 94, 0.45);
-      animation: alertPulse 3s infinite;
-    }
-
-    @keyframes alertPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-      50% { box-shadow: 0 0 20px 2px rgba(244, 63, 94, 0.2); }
-    }
-
-    .scam-icon-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-
-    .scam-box.low .scam-icon-badge { background: rgba(16, 185, 129, 0.15); }
-    .scam-box.medium .scam-icon-badge { background: rgba(245, 158, 11, 0.15); }
-    .scam-box.high .scam-icon-badge { background: rgba(244, 63, 94, 0.2); }
-
-    .scam-content {
-      flex: 1;
-    }
-
-    .scam-title-row {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
       margin-bottom: 0.35rem;
     }
 
-    .scam-label {
-      font-size: 0.88rem;
-      font-weight: 700;
+    .metric-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .metric-value.amount { color: var(--gold); }
+
+    /* ── Scam Assessment Banner ── */
+    .security-check-card {
+      border-radius: var(--radius-sm);
+      padding: 1.35rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+    }
+
+    .security-check-card.low {
+      border-left: 4px solid var(--emerald);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .security-check-card.medium {
+      border-left: 4px solid var(--amber);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .security-check-card.high {
+      border-left: 4px solid var(--crimson);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .check-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.65rem;
+    }
+
+    .check-title {
+      font-size: 0.92rem;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
 
-    .scam-box.low .scam-label { color: #34d399; }
-    .scam-box.medium .scam-label { color: #fbbf24; }
-    .scam-box.high .scam-label { color: #fb7185; }
+    .security-check-card.low .check-title { color: var(--emerald); }
+    .security-check-card.medium .check-title { color: var(--amber); }
+    .security-check-card.high .check-title { color: var(--crimson); }
 
-    /* Meter Bar */
-    .risk-meter {
-      display: flex;
-      gap: 4px;
-      margin: 0.4rem 0 0.6rem;
-      max-width: 180px;
+    .check-reasons {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
     }
 
-    .risk-meter-bar {
-      height: 5px;
-      flex: 1;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .scam-box.low .risk-meter-bar:nth-child(1) { background: #10b981; }
-    .scam-box.medium .risk-meter-bar:nth-child(1),
-    .scam-box.medium .risk-meter-bar:nth-child(2) { background: #f59e0b; }
-    .scam-box.high .risk-meter-bar:nth-child(1),
-    .scam-box.high .risk-meter-bar:nth-child(2),
-    .scam-box.high .risk-meter-bar:nth-child(3) { background: #f43f5e; }
-
-    .scam-reasons {
-      font-size: 0.86rem;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    .scam-reasons li {
+    .check-reasons li {
       list-style: none;
-      padding-left: 1rem;
+      padding-left: 1.1rem;
       position: relative;
-      margin-top: 0.2rem;
+      margin-top: 0.25rem;
     }
 
-    .scam-reasons li::before {
-      content: "•";
+    .check-reasons li::before {
+      content: "—";
       position: absolute;
       left: 0;
-      color: var(--text-muted);
+      color: var(--text-dim);
     }
 
     /* ── Action Toolbar ── */
     .action-bar {
       display: flex;
-      gap: 0.65rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
     }
 
     .action-bar .btn-action {
@@ -691,592 +593,566 @@
       min-width: 140px;
     }
 
-    /* Audio wave animation when speaking */
-    .audio-waves {
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-      height: 14px;
-    }
-
-    .audio-bar {
-      width: 2px;
-      height: 100%;
-      background: currentColor;
-      border-radius: 1px;
-      animation: wave 1s ease-in-out infinite;
-    }
-
-    .audio-bar:nth-child(2) { animation-delay: 0.2s; }
-    .audio-bar:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes wave {
-      0%, 100% { height: 4px; }
-      50% { height: 14px; }
-    }
-
-    /* ── Explanation Card ── */
-    .explanation-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .explanation-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .copy-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-family: inherit;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .copy-btn:hover {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .explanation {
+    /* ── Explanation Content ── */
+    .explanation-body {
       font-size: 1.02rem;
       line-height: 1.85;
       color: #e2e8f0;
     }
 
-    .explanation strong {
+    .explanation-body strong {
       color: #ffffff;
       font-weight: 700;
     }
 
-    .explanation br + strong, .explanation p strong {
-      color: #a5b4fc;
+    .explanation-body br + strong, .explanation-body p strong {
+      color: var(--gold);
     }
 
-    .disclaimer-box {
-      margin-top: 1.25rem;
+    .official-disclaimer {
+      margin-top: 1.5rem;
       padding: 0.75rem 1rem;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
+      border-left: 2px solid var(--border-strong);
+      background: var(--bg-surface-elevated);
       font-size: 0.8rem;
-      color: var(--text-muted);
+      color: var(--text-dim);
     }
 
-    /* ── Follow-Up Chat ── */
-    .chat-card {
-      margin-top: 1.35rem;
-    }
-
-    .chat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-
-    .chat-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #c7d2fe;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
+    /* ── Chat Panel ── */
     .chat-history {
       max-height: 340px;
       overflow-y: auto;
-      margin-bottom: 1.1rem;
+      margin-bottom: 1rem;
       display: flex;
       flex-direction: column;
       gap: 0.85rem;
-      padding-right: 0.4rem;
+      padding-right: 0.35rem;
     }
 
-    .chat-history::-webkit-scrollbar {
-      width: 5px;
-    }
-    .chat-history::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-    }
-
-    .chat-msg-row {
+    .chat-bubble-row {
       display: flex;
-      gap: 0.65rem;
-      align-items: flex-start;
+      flex-direction: column;
       max-width: 90%;
-      animation: fadeInMsg 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes fadeInMsg {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .chat-msg-row.user {
+    .chat-bubble-row.user {
       align-self: flex-end;
-      flex-direction: row-reverse;
+      align-items: flex-end;
     }
 
-    .chat-msg-row.bot {
+    .chat-bubble-row.bot {
       align-self: flex-start;
+      align-items: flex-start;
     }
 
-    .avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .avatar.bot {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
-    }
-
-    .avatar.user {
-      background: rgba(255, 255, 255, 0.12);
-      color: #e2e8f0;
+    .chat-meta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      margin-bottom: 0.25rem;
     }
 
     .chat-bubble {
-      border-radius: 14px;
-      padding: 0.75rem 1.05rem;
+      border-radius: var(--radius-sm);
+      padding: 0.8rem 1.1rem;
       font-size: 0.92rem;
       line-height: 1.6;
     }
 
-    .chat-msg-row.user .chat-bubble {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      color: #ffffff;
-      border-top-right-radius: 4px;
+    .chat-bubble-row.user .chat-bubble {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--gold-border);
+      color: var(--text-main);
     }
 
-    .chat-msg-row.bot .chat-bubble {
-      background: rgba(22, 26, 44, 0.9);
-      border: 1px solid var(--border);
-      color: #e2e8f0;
-      border-top-left-radius: 4px;
-    }
-
-    .typing-dots {
-      display: inline-flex;
-      gap: 4px;
-      padding: 4px 6px;
-    }
-
-    .typing-dots span {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #818cf8;
-      animation: blink 1.2s infinite alternate;
-    }
-
-    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes blink {
-      0% { opacity: 0.2; transform: translateY(0); }
-      100% { opacity: 1; transform: translateY(-3px); }
+    .chat-bubble-row.bot .chat-bubble {
+      background: #0f1523;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
     }
 
     .chat-input-row {
       display: flex;
-      gap: 0.6rem;
-      background: rgba(14, 18, 32, 0.8);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.35rem 0.4rem 0.35rem 0.85rem;
-      transition: border-color 0.2s;
-    }
-
-    .chat-input-row:focus-within {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      gap: 0.65rem;
     }
 
     .chat-input-row input {
       flex: 1;
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      padding: 0.5rem 0;
-      font-size: 0.92rem;
-    }
-
-    .chat-input-row input:focus {
-      border: none;
-      box-shadow: none;
     }
 
     .chat-input-row button {
-      padding: 0.6rem 1.15rem;
-      border-radius: 9px;
+      padding: 0.65rem 1.35rem;
+      background: var(--gold);
+      color: #0a0e17;
+      font-weight: 700;
       border: none;
-      background: var(--accent-grad);
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.88rem;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       font-family: inherit;
-      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    /* ── Auth Modal ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.75);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .modal-tab {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      padding: 0.35rem 0.5rem;
+      position: relative;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-tab.active {
+      color: var(--gold);
+    }
+
+    .modal-tab.active::after {
+      content: "";
+      position: absolute;
+      bottom: -0.5rem;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gold);
+    }
+
+    /* ── History Drawer ── */
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 90;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -440px;
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-strong);
+      z-index: 95;
+      transition: right 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+
+    .drawer.open { right: 0; }
+
+    .drawer-header {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
-    .chat-input-row button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    .drawer-title {
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #fff;
     }
 
-    /* ── Alerts & Banners ── */
+    .drawer-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .history-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+
+    .history-card:hover {
+      border-color: var(--gold);
+    }
+
+    .history-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
+    }
+
+    .history-type {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .history-meta {
+      display: flex;
+      gap: 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .history-date {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 0.45rem;
+    }
+
+    /* ── Alerts ── */
     .alert {
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
       padding: 0.85rem 1.15rem;
       font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
       margin-bottom: 1rem;
     }
 
     .alert-err {
-      background: rgba(244, 63, 94, 0.1);
-      border: 1px solid rgba(244, 63, 94, 0.35);
-      color: #fda4af;
-    }
-
-    .no-key-banner {
-      background: rgba(244, 63, 94, 0.08);
-      border: 1px solid rgba(244, 63, 94, 0.3);
+      background: var(--crimson-bg);
+      border: 1px solid var(--crimson-border);
       color: #fca5a5;
-      border-radius: var(--radius-md);
-      padding: 1.1rem 1.35rem;
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      gap: 0.85rem;
-      align-items: flex-start;
     }
 
-    .no-key-banner code {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      padding: 0.15rem 0.45rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
+    .toast-saved {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-sm);
+      background: var(--emerald-bg);
+      border: 1px solid var(--emerald-border);
+      color: #6ee7b7;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 1.25rem;
     }
 
-    .no-key-banner a {
-      color: #93c5fd;
-      text-decoration: underline;
-    }
-
-    /* ── Utilities & Animations ── */
     .spinner {
       display: inline-block;
-      width: 17px;
-      height: 17px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #ffffff;
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(0, 0, 0, 0.25);
+      border-top-color: #000;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.9); }
-    }
+    #result-section { display: none; }
+    #chat-section { display: none; }
 
-    #result-section {
-      display: none;
-      animation: fadeInSection 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    #chat-section {
-      display: none;
-    }
-
-    @keyframes fadeInSection {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Footer */
     footer {
       text-align: center;
-      margin-top: 3rem;
-      color: var(--text-muted);
+      margin-top: 4rem;
+      color: var(--text-dim);
       font-size: 0.8rem;
-    }
-
-    footer a {
-      color: var(--text-secondary);
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 2rem;
     }
   </style>
 </head>
 <body>
-<div class="container">
 
-  <!-- ── Header ── -->
-  <header>
-    <div class="brand-badge">
-      <span class="pulse-dot"></span>
-      Powered by Open-Weight Gemma 4
+  <!-- ── Top Navigation Bar ── -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="brand">
+        <div class="brand-mark">S</div>
+        <div class="brand-title">
+          <span>Samjan</span>
+          <span class="brand-subtitle">Document Verification</span>
+        </div>
+      </a>
+
+      <div class="nav-actions">
+        <!-- Guest Button -->
+        <button class="nav-btn nav-btn-gold" id="open-auth-btn">
+          Sign In / Register
+        </button>
+
+        <!-- Logged in view -->
+        <div id="user-logged-in-view" style="display:none; align-items:center; gap:0.65rem;">
+          <button class="nav-btn" id="open-history-btn">
+            <span>Saved Records</span>
+            <span class="count-tag" id="history-count">0</span>
+          </button>
+          <span class="user-tag">
+            <span id="user-name-display">User</span>
+          </span>
+          <button class="nav-btn" id="logout-btn" title="Sign out">
+            Sign Out
+          </button>
+        </div>
+      </div>
     </div>
-    <h1>Samjan <span class="accent-word">સમજણ</span></h1>
-    <p>Snap a photo of any letter, bill, or government notice. Get a crystal-clear explanation and scam check in your language.</p>
   </header>
 
-  {% if not has_key %}
-  <div class="no-key-banner">
-    <div style="font-size:1.3rem;">⚠️</div>
-    <div>
-      <strong>API Key Not Detected:</strong> Create a <code>.env</code> file in the app folder with
-      <code>GEMINI_API_KEY=your_key</code> and restart.
-      Get a free key from <a href="https://aistudio.google.com" target="_blank" rel="noopener">Google AI Studio</a>.
-    </div>
-  </div>
-  {% endif %}
+  <!-- ── Main Content Container ── -->
+  <main class="container">
 
-  <!-- ── Upload Card ── -->
-  <div class="card">
-    
-    <div class="form-row">
-      <div class="form-group">
-        <label for="lang">🌐 Explain in Language</label>
-        <select id="lang">
-          <option value="Gujarati">ગુજરાતી (Gujarati)</option>
-          <option value="Hindi">हिंदी (Hindi)</option>
-          <option value="English" selected>English</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="question">❓ Specific Question (Optional)</label>
-        <input type="text" id="question" placeholder="e.g. How much do I owe? When to pay?" />
-      </div>
+    <!-- Editorial Header (No AI Slop / No Purple) -->
+    <div class="hero-panel">
+      <div class="hero-kicker">Security & Verification Services</div>
+      <h1>Official Notice & Bill Explainer</h1>
+      <p>Submit any utility bill, tax document, court notice, or government correspondence. Receive an authoritative summary, critical deadlines, and a fraud authenticity check in Gujarati, Hindi, or English.</p>
     </div>
 
-    <!-- Quick Question Chips -->
-    <div style="margin-top:-0.5rem; margin-bottom:1.25rem;">
-      <div class="chip-container">
-        <span class="chip" onclick="setQuestion('How much do I owe and what is the deadline?')">💰 Amount & Deadline?</span>
-        <span class="chip" onclick="setQuestion('Is this document a scam or fake notice?')">🛡️ Is it a fake notice?</span>
-        <span class="chip" onclick="setQuestion('How can I pay or resolve this?')">💳 How to pay?</span>
-        <span class="chip" onclick="setQuestion('What happens if I miss the due date?')">⚠️ If I miss the date?</span>
-      </div>
+    {% if not has_key %}
+    <div class="alert alert-err">
+      <strong>API Configuration Required:</strong> GEMINI_API_KEY is missing from <code>.env</code>.
     </div>
+    {% endif %}
 
-    <!-- Drop Zone -->
-    <div class="form-group">
-      <label>📸 Document Photo</label>
-      <div class="drop-zone" id="drop-zone">
-        <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg,image/webp" capture="environment" />
-        <div class="drop-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-        </div>
-        <div class="drop-primary-text">Drag & drop your document here, or click to browse</div>
-        <div class="drop-subtext">Supports PNG, JPG, or screenshot pasted with Ctrl+V</div>
-        <div id="file-badge-wrap" style="display:none;">
-          <span class="file-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span id="filename"></span>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Preview Container with Laser Scan effect -->
-    <div id="preview-wrap">
-      <div class="scan-line"></div>
-      <button class="preview-clear-btn" id="clear-preview" title="Remove image">✕</button>
-      <img id="preview" src="" alt="Document Preview" />
-    </div>
-
-    <!-- Primary Actions -->
-    <button class="btn btn-primary" id="explain-btn" {% if not has_key %}disabled{% endif %}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-      </svg>
-      <span>Explain this document</span>
-    </button>
-    <button class="btn btn-secondary" id="sample-btn" type="button">
-      <span>📄 Try with a sample electricity bill</span>
-    </button>
-  </div>
-
-  <!-- ── Results Section ── -->
-  <div id="result-section">
-
-    <!-- Dashboard Key Metrics -->
-    <div class="dash-grid">
-      <div class="dash-card type-card">
-        <div class="dash-header">
-          <span class="label">Document Type</span>
-          <span class="dash-icon">📑</span>
-        </div>
-        <div class="value" id="dash-type">—</div>
-      </div>
-      <div class="dash-card amount-card">
-        <div class="dash-header">
-          <span class="label">Amount Due</span>
-          <span class="dash-icon">💰</span>
-        </div>
-        <div class="value amount" id="dash-amount">—</div>
-      </div>
-      <div class="dash-card deadline-card">
-        <div class="dash-header">
-          <span class="label">Due Date</span>
-          <span class="dash-icon">📅</span>
-        </div>
-        <div class="value deadline" id="dash-deadline">—</div>
-      </div>
-    </div>
-
-    <!-- Scam Risk Evaluation -->
-    <div class="scam-box" id="scam-box">
-      <div class="scam-icon-badge" id="scam-icon">🛡️</div>
-      <div class="scam-content">
-        <div class="scam-title-row">
-          <div class="scam-label" id="scam-label">Scam Risk Assessment</div>
-        </div>
-        <div class="risk-meter">
-          <div class="risk-meter-bar"></div>
-          <div class="risk-meter-bar"></div>
-          <div class="risk-meter-bar"></div>
-        </div>
-        <ul class="scam-reasons" id="scam-reasons"></ul>
-      </div>
-    </div>
-
-    <!-- Quick Action Bar -->
-    <div class="action-bar">
-      <button class="btn-action" id="speak-btn">
-        <span id="speak-icon">🔊</span>
-        <span id="speak-label">Read aloud</span>
-        <span class="audio-waves" id="speak-waves" style="display:none;">
-          <span class="audio-bar"></span>
-          <span class="audio-bar"></span>
-          <span class="audio-bar"></span>
-        </span>
-      </button>
-
-      <button class="btn-action" id="ics-btn" disabled>
-        <span>📅</span>
-        <span>Add to calendar</span>
-      </button>
-
-      <button class="btn-action" id="wa-btn">
-        <span>💬</span>
-        <span>Share to WhatsApp</span>
-      </button>
-    </div>
-
-    <!-- Main Explanation Card -->
+    <!-- ── Submission Card ── -->
     <div class="card">
-      <div class="explanation-header">
-        <div class="explanation-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          Plain-Language Explanation
+      <div class="card-header-bar">
+        <span class="card-title">1. Document Details</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="lang">Language for Explanation</label>
+          <select id="lang">
+            <option value="Gujarati">ગુજરાતી (Gujarati)</option>
+            <option value="Hindi">हिंदी (Hindi)</option>
+            <option value="English" selected>English</option>
+          </select>
         </div>
-        <button class="copy-btn" id="copy-btn" title="Copy text">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span id="copy-label">Copy</span>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="question">Specific Inquiry (Optional)</label>
+          <input type="text" id="question" placeholder="e.g. Total amount payable and due date" />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:1.25rem;">
+        <label>Document Photo or Scan</label>
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg,image/webp" capture="environment" />
+          <div class="drop-icon">📄</div>
+          <div class="drop-title">Upload Document Photo or Paste (Ctrl+V)</div>
+          <div class="drop-hint">Supports clear camera photos, PNG, JPG, or PDF screenshots</div>
+          <div id="file-badge-wrap" style="display:none;">
+            <span class="file-badge" id="filename"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="preview-wrap">
+        <button class="preview-clear-btn" id="clear-preview" title="Remove image">✕</button>
+        <img id="preview" src="" alt="Document Preview" />
+      </div>
+
+      <button class="btn btn-gold" id="explain-btn" {% if not has_key %}disabled{% endif %}>
+        Verify & Explain Document
+      </button>
+      <button class="btn btn-outline" id="sample-btn" type="button">
+        Load Sample Electricity Bill
+      </button>
+    </div>
+
+    <!-- ── Result Section ── -->
+    <section id="result-section">
+
+      <div id="saved-toast-wrap" style="display:none;">
+        <span class="toast-saved">✓ Document Record Saved to Account</span>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Document Classification</div>
+          <div class="metric-value" id="dash-type">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Amount Payable</div>
+          <div class="metric-value amount" id="dash-amount">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Payment Deadline</div>
+          <div class="metric-value" id="dash-deadline">—</div>
+        </div>
+      </div>
+
+      <!-- Fraud / Authenticity Check -->
+      <div class="security-check-card" id="scam-box">
+        <div class="check-header">
+          <span class="check-title" id="scam-label">Authenticity Verification</span>
+          <span id="scam-icon" style="font-size:1.15rem;">🛡️</span>
+        </div>
+        <ul class="check-reasons" id="scam-reasons"></ul>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-bar">
+        <button class="btn-action" id="speak-btn">
+          <span id="speak-icon">🔊</span>
+          <span id="speak-label">Read Aloud</span>
+        </button>
+
+        <button class="btn-action" id="ics-btn" disabled>
+          <span>📅</span>
+          <span>Add Deadline to Calendar</span>
+        </button>
+
+        <button class="btn-action" id="wa-btn">
+          <span>💬</span>
+          <span>Share to WhatsApp</span>
+        </button>
+
+        <button class="btn-action" id="copy-btn">
+          <span>📋</span>
+          <span id="copy-label">Copy Text</span>
         </button>
       </div>
 
-      <div class="explanation" id="explanation-content"></div>
-
-      <div class="disclaimer-box">
-        <span>⚠️</span>
-        <span>AI can make mistakes. Always verify critical payments and deadlines with official agencies.</span>
-      </div>
-    </div>
-
-    <!-- Follow-up Chat Card -->
-    <div id="chat-section" class="card chat-card">
-      <div class="chat-header">
-        <div class="chat-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          Ask Follow-Up Questions
+      <!-- Detailed Explanation -->
+      <div class="card">
+        <div class="card-header-bar">
+          <span class="card-title">2. Plain-Language Explanation</span>
+        </div>
+        <div class="explanation-body" id="explanation-content"></div>
+        <div class="official-disclaimer">
+          Notice: Always cross-verify critical tax, legal, and banking payments through official government portals.
         </div>
       </div>
-      <div class="chat-history" id="chat-history"></div>
-      <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="Ask anything, e.g. Where can I pay this online?" />
-        <button id="chat-send" disabled>
-          <span>Send</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
+
+      <!-- Follow-up Inquiries -->
+      <div id="chat-section" class="card">
+        <div class="card-header-bar">
+          <span class="card-title">3. Document Inquiries</span>
+        </div>
+        <div class="chat-history" id="chat-history"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Ask a question about this document..." />
+          <button id="chat-send" disabled>Submit</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── Auth Modal ── -->
+    <div class="modal-backdrop" id="auth-modal">
+      <div class="modal-box">
+        <button class="modal-close" id="close-auth-modal">✕</button>
+        
+        <div class="modal-tabs">
+          <button class="modal-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+          <button class="modal-tab" id="tab-register" onclick="switchAuthTab('register')">Create Account</button>
+        </div>
+
+        <p id="auth-subtext" style="color:var(--text-muted); font-size:0.86rem; margin-bottom:1.25rem;">
+          Sign in or create an account to record this document and view it at any time.
+        </p>
+
+        <div id="auth-error" style="display:none;" class="alert alert-err"></div>
+
+        <form id="auth-form">
+          <div class="form-group">
+            <label for="auth-username">Username</label>
+            <input type="text" id="auth-username" required placeholder="Enter username" autocomplete="username" />
+          </div>
+
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label for="auth-password">Password</label>
+            <input type="password" id="auth-password" required placeholder="Enter password" autocomplete="current-password" />
+          </div>
+
+          <button type="submit" class="btn btn-gold" id="auth-submit-btn">
+            <span id="auth-btn-label">Sign In & Verify</span>
+          </button>
+          
+          <button type="button" class="btn btn-outline" id="auth-guest-btn" style="margin-top:0.75rem;">
+            Continue as Guest (Do Not Save)
+          </button>
+        </form>
       </div>
     </div>
 
-  </div><!-- /result-section -->
+    <!-- ── History Drawer ── -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+    <aside class="drawer" id="history-drawer">
+      <div class="drawer-header">
+        <span class="drawer-title">Document Archive</span>
+        <button class="modal-close" id="close-drawer-btn" style="position:static;">✕</button>
+      </div>
+      <div class="drawer-list" id="drawer-list"></div>
+    </aside>
 
-  <footer>
-    <p>Samjan • Empowering Indian citizens with open-source AI • Built with Gemma 4</p>
-  </footer>
+    <footer>
+      <p>Samjan • Secure Document Verification & Plain-Language Assistance • Powered by Gemma 4</p>
+    </footer>
 
-</div><!-- /container -->
+  </main>
 
 <script>
-  // ── State ──────────────────────────────────────────────────────────────────
-  let selectedFile = null;
-  let lastResult   = null;
-  let speaking     = false;
+  let selectedFile   = null;
+  let lastResult     = null;
+  let speaking       = false;
+  let currentUser    = null;
+  let currentAuthTab = 'login';
+  let pendingExplain = false;
 
-  // ── DOM References ─────────────────────────────────────────────────────────
   const fileInput      = document.getElementById('file-input');
   const dropZone       = document.getElementById('drop-zone');
   const previewWrap    = document.getElementById('preview-wrap');
@@ -1287,6 +1163,7 @@
   const explainBtn     = document.getElementById('explain-btn');
   const sampleBtn      = document.getElementById('sample-btn');
   const resultSection  = document.getElementById('result-section');
+  const savedToastWrap = document.getElementById('saved-toast-wrap');
 
   const dashType     = document.getElementById('dash-type');
   const dashAmount   = document.getElementById('dash-amount');
@@ -1302,7 +1179,6 @@
   const speakBtn     = document.getElementById('speak-btn');
   const speakIcon    = document.getElementById('speak-icon');
   const speakLabel   = document.getElementById('speak-label');
-  const speakWaves   = document.getElementById('speak-waves');
   const icsBtn       = document.getElementById('ics-btn');
   const waBtn        = document.getElementById('wa-btn');
 
@@ -1311,18 +1187,213 @@
   const chatInput    = document.getElementById('chat-input');
   const chatSend     = document.getElementById('chat-send');
 
-  // ── Quick chips helper ─────────────────────────────────────────────────────
-  window.setQuestion = function(q) {
-    const input = document.getElementById('question');
-    input.value = q;
-    input.focus();
+  const openAuthBtn    = document.getElementById('open-auth-btn');
+  const userLoggedInView = document.getElementById('user-logged-in-view');
+  const userNameDisplay = document.getElementById('user-name-display');
+  const historyCount   = document.getElementById('history-count');
+  const logoutBtn      = document.getElementById('logout-btn');
+  const authModal      = document.getElementById('auth-modal');
+  const closeAuthModal = document.getElementById('close-auth-modal');
+  const authForm       = document.getElementById('auth-form');
+  const authUsername   = document.getElementById('auth-username');
+  const authPassword   = document.getElementById('auth-password');
+  const authError      = document.getElementById('auth-error');
+  const authSubtext    = document.getElementById('auth-subtext');
+  const authBtnLabel   = document.getElementById('auth-btn-label');
+  const authGuestBtn   = document.getElementById('auth-guest-btn');
+  const openHistoryBtn = document.getElementById('open-history-btn');
+  const historyDrawer  = document.getElementById('history-drawer');
+  const drawerBackdrop = document.getElementById('drawer-backdrop');
+  const closeDrawerBtn = document.getElementById('close-drawer-btn');
+  const drawerList     = document.getElementById('drawer-list');
+
+  async function checkAuth() {
+    try {
+      const resp = await fetch('/auth/me');
+      const data = await resp.json();
+      if (data.logged_in && data.user) {
+        currentUser = data.user;
+        renderUserView(true);
+        loadHistory();
+      } else {
+        currentUser = null;
+        renderUserView(false);
+      }
+    } catch (e) {
+      currentUser = null;
+      renderUserView(false);
+    }
+  }
+
+  function renderUserView(isLoggedIn) {
+    if (isLoggedIn && currentUser) {
+      openAuthBtn.style.display = 'none';
+      userLoggedInView.style.display = 'inline-flex';
+      userNameDisplay.textContent = currentUser.username;
+    } else {
+      openAuthBtn.style.display = 'inline-flex';
+      userLoggedInView.style.display = 'none';
+      savedToastWrap.style.display = 'none';
+    }
+  }
+
+  openAuthBtn.addEventListener('click', () => {
+    pendingExplain = false;
+    authSubtext.textContent = 'Sign in or create an account to view and save all your verified documents.';
+    authGuestBtn.style.display = 'none';
+    authModal.style.display = 'flex';
+    authError.style.display = 'none';
+    authUsername.focus();
+  });
+
+  closeAuthModal.addEventListener('click', () => { authModal.style.display = 'none'; });
+  authModal.addEventListener('click', (e) => {
+    if (e.target === authModal) authModal.style.display = 'none';
+  });
+
+  authGuestBtn.addEventListener('click', () => {
+    authModal.style.display = 'none';
+    if (pendingExplain) {
+      pendingExplain = false;
+      runExplain();
+    }
+  });
+
+  window.switchAuthTab = function(tab) {
+    currentAuthTab = tab;
+    authError.style.display = 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    authBtnLabel.textContent = tab === 'login' ? 'Sign In & Verify' : 'Create Account & Verify';
   };
 
-  // ── Drag & Drop & Paste Support ────────────────────────────────────────────
-  dropZone.addEventListener('dragover', e => { 
-    e.preventDefault(); 
-    dropZone.classList.add('drag-over'); 
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const endpoint = currentAuthTab === 'login' ? '/auth/login' : '/auth/register';
+    authError.style.display = 'none';
+
+    try {
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: authUsername.value.trim(),
+          password: authPassword.value
+        })
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) {
+        authError.textContent = data.error || 'Authentication failed.';
+        authError.style.display = 'block';
+        return;
+      }
+
+      currentUser = data.user;
+      renderUserView(true);
+      authModal.style.display = 'none';
+      authPassword.value = '';
+      loadHistory();
+
+      if (pendingExplain) {
+        pendingExplain = false;
+        runExplain();
+      }
+    } catch (err) {
+      authError.textContent = 'Network error: ' + err.message;
+      authError.style.display = 'block';
+    }
   });
+
+  logoutBtn.addEventListener('click', async () => {
+    await fetch('/auth/logout', { method: 'POST' });
+    currentUser = null;
+    renderUserView(false);
+    historyDrawer.classList.remove('open');
+    drawerBackdrop.style.display = 'none';
+  });
+
+  openHistoryBtn.addEventListener('click', () => {
+    loadHistory();
+    historyDrawer.classList.add('open');
+    drawerBackdrop.style.display = 'block';
+  });
+
+  closeDrawerBtn.addEventListener('click', closeDrawer);
+  drawerBackdrop.addEventListener('click', closeDrawer);
+
+  function closeDrawer() {
+    historyDrawer.classList.remove('open');
+    drawerBackdrop.style.display = 'none';
+  }
+
+  async function loadHistory() {
+    if (!currentUser) return;
+    try {
+      const resp = await fetch('/history');
+      const data = await resp.json();
+      const docs = data.documents || [];
+      historyCount.textContent = docs.length;
+
+      if (docs.length === 0) {
+        drawerList.innerHTML = `
+          <div style="text-align:center; padding:3rem 1rem; color:var(--text-dim);">
+            <p>No archived records found.</p>
+          </div>
+        `;
+        return;
+      }
+
+      drawerList.innerHTML = docs.map(d => {
+        const riskClass = (d.scam_risk || 'low').toLowerCase();
+        return `
+          <div class="history-card" onclick="loadSavedDoc(${d.id})">
+            <div class="history-top">
+              <span class="history-type">${d.doc_type || 'Document'}</span>
+              <button class="preview-clear-btn" style="position:static; width:24px; height:24px;" onclick="deleteHistoryDoc(event, ${d.id})" title="Delete">✕</button>
+            </div>
+            <div class="history-meta">
+              <span>Amount: ${d.amount || 'N/A'}</span>
+              <span>Due: ${d.deadline_display || d.deadline || 'N/A'}</span>
+            </div>
+            <div class="history-date">${d.created_at || ''}</div>
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  window.loadSavedDoc = async function(id) {
+    closeDrawer();
+    try {
+      const resp = await fetch(`/history/${id}`);
+      const data = await resp.json();
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+      lastResult = data;
+      renderResult(data);
+      savedToastWrap.style.display = 'block';
+    } catch (e) {
+      alert('Could not load record: ' + e.message);
+    }
+  };
+
+  window.deleteHistoryDoc = async function(e, id) {
+    e.stopPropagation();
+    if (!confirm('Remove this document from your records?')) return;
+    try {
+      await fetch(`/history/${id}`, { method: 'DELETE' });
+      loadHistory();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // ── Drag & Drop ──
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => { 
     e.preventDefault(); 
@@ -1333,7 +1404,6 @@
   });
   fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
 
-  // Clipboard Paste support (Ctrl+V)
   window.addEventListener('paste', e => {
     const items = (e.clipboardData || e.originalEvent.clipboardData).items;
     for (let item of items) {
@@ -1348,7 +1418,7 @@
   function handleFile(file) {
     if (!file) return;
     selectedFile = file;
-    filenameEl.textContent = file.name || 'Pasted Image.png';
+    filenameEl.textContent = file.name || 'Document Scan.png';
     fileBadgeWrap.style.display = 'block';
 
     const reader = new FileReader();
@@ -1369,10 +1439,9 @@
     filenameEl.textContent = '';
   });
 
-  // ── Sample Bill Loader ─────────────────────────────────────────────────────
   sampleBtn.addEventListener('click', async () => {
     sampleBtn.disabled = true;
-    sampleBtn.innerHTML = '<span class="spinner"></span> Loading sample bill…';
+    sampleBtn.textContent = 'Loading Sample Bill...';
     try {
       const resp = await fetch('/sample');
       const blob = await resp.blob();
@@ -1381,20 +1450,34 @@
       alert('Error fetching sample: ' + err.message);
     } finally {
       sampleBtn.disabled = false;
-      sampleBtn.innerHTML = '<span>📄 Try with a sample electricity bill</span>';
+      sampleBtn.textContent = 'Load Sample Electricity Bill';
     }
   });
 
-  // ── Explain Execution ──────────────────────────────────────────────────────
-  explainBtn.addEventListener('click', async () => {
+  explainBtn.addEventListener('click', () => {
     if (!selectedFile) {
-      alert('Please upload or select a document photo first.');
+      alert('Please upload or select a document scan first.');
       return;
     }
-    
+
+    if (!currentUser) {
+      pendingExplain = true;
+      authSubtext.textContent = 'Sign in or create an account to record this document and view it at any time, or continue as guest.';
+      authGuestBtn.style.display = 'block';
+      authModal.style.display = 'flex';
+      authError.style.display = 'none';
+      authUsername.focus();
+      return;
+    }
+
+    runExplain();
+  });
+
+  async function runExplain() {
     setLoading(true);
     resultSection.style.display = 'none';
     chatSection.style.display = 'none';
+    savedToastWrap.style.display = 'none';
 
     const form = new FormData();
     form.append('image', selectedFile);
@@ -1410,116 +1493,99 @@
       }
       lastResult = data;
       renderResult(data);
+
+      if (currentUser && data.saved_id) {
+        savedToastWrap.style.display = 'block';
+        loadHistory();
+      }
     } catch (e) {
       showError('Network error: ' + e.message);
     } finally {
       setLoading(false);
     }
-  });
+  }
 
   function setLoading(on) {
     explainBtn.disabled = on;
-    if (on) {
-      explainBtn.innerHTML = '<span class="spinner"></span> Reading & analyzing document…';
-      previewWrap.classList.add('scanning');
-    } else {
-      explainBtn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-        </svg>
-        <span>Explain this document</span>
-      `;
-      previewWrap.classList.remove('scanning');
-    }
+    explainBtn.innerHTML = on ? '<span class="spinner"></span> Analyzing Document...' : 'Verify & Explain Document';
   }
 
   function showError(msg) {
     resultSection.style.display = 'block';
-    exContent.innerHTML = `<div class="alert alert-err"><span>⚠️</span><span>${msg}</span></div>`;
+    exContent.innerHTML = `<div class="alert alert-err">${msg}</div>`;
     dashType.textContent = dashAmount.textContent = dashDeadline.textContent = '—';
-    scamBox.className = 'scam-box low';
+    scamBox.className = 'security-check-card low';
     scamReasons.innerHTML = '';
+    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ── Render Structured Results ──────────────────────────────────────────────
   function renderResult(d) {
-    // 1. Dashboard Metrics
     dashType.textContent     = d.type     || 'General Document';
     dashAmount.textContent   = d.amount   || 'None';
     dashDeadline.textContent = d.deadline_display || d.deadline || 'No Deadline';
 
-    // 2. Scam Risk Box
     const risk = (d.scam_risk || 'low').toLowerCase();
     const icons = { low: '🛡️', medium: '⚠️', high: '🚨' };
     const labels = { 
-      low: 'Low Scam Risk — Document appears authentic', 
-      medium: 'Medium Scam Risk — Verify with caution', 
-      high: 'High Scam Risk — Potential Fraud or Scam!' 
+      low: 'Authenticity Verification: Low Fraud Risk', 
+      medium: 'Authenticity Verification: Caution Advised', 
+      high: 'Authenticity Verification: High Fraud Risk' 
     };
 
-    scamBox.className = 'scam-box ' + (['low','medium','high'].includes(risk) ? risk : 'low');
+    scamBox.className = 'security-check-card ' + (['low','medium','high'].includes(risk) ? risk : 'low');
     scamIcon.textContent = icons[risk] || '🛡️';
-    scamLabel.textContent = labels[risk] || 'Scam Risk Assessment';
+    scamLabel.textContent = labels[risk] || 'Authenticity Verification';
     
     if (d.scam_reasons && d.scam_reasons.length > 0) {
       scamReasons.innerHTML = d.scam_reasons.map(r => `<li>${r}</li>`).join('');
     } else {
-      scamReasons.innerHTML = '<li>No suspicious red flags or urgency traps identified.</li>';
+      scamReasons.innerHTML = '<li>Document conforms to standard official formatting and verified identifiers.</li>';
     }
 
-    // 3. Explanation Markdown
-    exContent.innerHTML = md(d.explanation || 'No explanation generated.');
+    exContent.innerHTML = md(d.explanation || 'No summary available.');
 
-    // 4. Action Buttons
     const hasDeadline = d.deadline && d.deadline !== 'N/A' && d.deadline.trim() !== '';
     icsBtn.disabled = !hasDeadline;
     waBtn.onclick = () => shareWhatsApp(d);
     icsBtn.onclick = () => downloadIcs(d);
 
-    // Reset Voice Read Aloud if active
     if (speaking) {
       speechSynthesis.cancel();
       resetSpeechBtn();
     }
 
-    // Show sections
     resultSection.style.display = 'block';
     chatSection.style.display = 'block';
     chatSend.disabled = false;
     chatHistory.innerHTML = '';
     
-    // Add introductory bot greeting to chat
-    appendMsg('Feel free to ask any follow-up questions about this document (e.g. where to pay, what to check, or clarification on terms).', 'bot');
-
+    appendMsg('Document verified. You may ask questions regarding payment channels, terminology, or deadlines below.', 'bot');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ── Markdown Parser ────────────────────────────────────────────────────────
   function md(text) {
     return text
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^#{1,3}\s+(.+)$/gm, '<strong style="color:#c7d2fe;font-size:1.05rem;display:block;margin-top:1rem;margin-bottom:0.35rem">$1</strong>')
-      .replace(/^(\d+)\.\s+/gm, '<br><strong style="color:#818cf8">$1.</strong> ')
+      .replace(/^#{1,3}\s+(.+)$/gm, '<strong style="color:var(--gold);font-size:1.05rem;display:block;margin-top:1.1rem;margin-bottom:0.35rem">$1</strong>')
+      .replace(/^(\d+)\.\s+/gm, '<br><strong style="color:var(--gold)">$1.</strong> ')
       .replace(/^[-*]\s+/gm, '<br>• ')
       .replace(/\n/g, '<br>');
   }
 
-  // ── Copy Explanation ───────────────────────────────────────────────────────
   copyBtn.addEventListener('click', async () => {
     if (!lastResult || !lastResult.explanation) return;
     const plainText = lastResult.explanation.replace(/<[^>]+>/g, '').replace(/[*#`]/g, '');
     try {
       await navigator.clipboard.writeText(plainText);
-      copyLabel.textContent = 'Copied!';
-      setTimeout(() => { copyLabel.textContent = 'Copy'; }, 2000);
+      copyLabel.textContent = 'Copied';
+      setTimeout(() => { copyLabel.textContent = 'Copy Text'; }, 2000);
     } catch (e) {
       copyLabel.textContent = 'Failed';
     }
   });
 
-  // ── Read Aloud (Web Speech API) ────────────────────────────────────────────
   speakBtn.addEventListener('click', () => {
     if (!lastResult) return;
     if (speaking) {
@@ -1545,24 +1611,19 @@
 
     speechSynthesis.speak(utt);
     speaking = true;
-    speakBtn.classList.add('active');
     speakIcon.textContent = '⏹';
-    speakLabel.textContent = 'Stop reading';
-    speakWaves.style.display = 'inline-flex';
+    speakLabel.textContent = 'Stop';
   });
 
   function resetSpeechBtn() {
     speaking = false;
-    speakBtn.classList.remove('active');
     speakIcon.textContent = '🔊';
-    speakLabel.textContent = 'Read aloud';
-    speakWaves.style.display = 'none';
+    speakLabel.textContent = 'Read Aloud';
   }
 
-  // ── Calendar (.ics) Download ───────────────────────────────────────────────
   async function downloadIcs(d) {
     const originalText = icsBtn.innerHTML;
-    icsBtn.innerHTML = '<span>⏳ Creating…</span>';
+    icsBtn.innerHTML = '<span>Creating Reminder...</span>';
     icsBtn.disabled = true;
 
     try {
@@ -1587,14 +1648,12 @@
     }
   }
 
-  // ── WhatsApp Share ─────────────────────────────────────────────────────────
   function shareWhatsApp(d) {
     const plain = (d.explanation || '').replace(/<[^>]+>/g, '').replace(/[*#`]/g, '').trim();
-    const msg = `📑 *${d.type}*\n💰 Amount Due: ${d.amount}\n📅 Deadline: ${d.deadline_display || d.deadline}\n🛡️ Scam Risk: ${d.scam_risk}\n\n${plain.slice(0, 500)}…\n\n_Explained by Samjan (Gemma 4)_`;
+    const msg = `📑 *${d.type}*\n💰 Amount Due: ${d.amount}\n📅 Deadline: ${d.deadline_display || d.deadline}\n🛡️ Verification: ${d.scam_risk}\n\n${plain.slice(0, 500)}…\n\n_Verified by Samjan_`;
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   }
 
-  // ── Follow-Up Chat ─────────────────────────────────────────────────────────
   chatSend.addEventListener('click', sendChat);
   chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
 
@@ -1606,7 +1665,7 @@
     chatInput.value = '';
     chatSend.disabled = true;
 
-    const thinkingRow = appendTypingIndicator();
+    const thinkingRow = appendMsg('Consulting document record...', 'bot');
 
     try {
       const resp = await fetch('/chat', {
@@ -1619,11 +1678,9 @@
         })
       });
       const data = await resp.json();
-      thinkingRow.remove();
-      appendMsg(md(data.answer || data.error || 'No response received.'), 'bot');
+      thinkingRow.innerHTML = md(data.answer || data.error || 'No response received.');
     } catch (e) {
-      thinkingRow.remove();
-      appendMsg('Network error: ' + e.message, 'bot');
+      thinkingRow.innerHTML = 'Network error: ' + e.message;
     } finally {
       chatSend.disabled = false;
       chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -1632,41 +1689,24 @@
 
   function appendMsg(text, role) {
     const row = document.createElement('div');
-    row.className = 'chat-msg-row ' + role;
-    
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar ' + role;
-    avatar.textContent = role === 'bot' ? '✦' : '👤';
+    row.className = 'chat-bubble-row ' + role;
+
+    const meta = document.createElement('div');
+    meta.className = 'chat-meta';
+    meta.textContent = role === 'bot' ? 'Samjan Verification Assistant' : (currentUser ? currentUser.username : 'User');
 
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble';
     bubble.innerHTML = text;
 
-    row.appendChild(avatar);
+    row.appendChild(meta);
     row.appendChild(bubble);
     chatHistory.appendChild(row);
     chatHistory.scrollTop = chatHistory.scrollHeight;
     return bubble;
   }
 
-  function appendTypingIndicator() {
-    const row = document.createElement('div');
-    row.className = 'chat-msg-row bot';
-    
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar bot';
-    avatar.textContent = '✦';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble';
-    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-
-    row.appendChild(avatar);
-    row.appendChild(bubble);
-    chatHistory.appendChild(row);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-    return row;
-  }
+  checkAuth();
 </script>
 </body>
 </html>
