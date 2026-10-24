@@ -3,309 +3,1286 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samjan — Document Explainer</title>
-  <meta name="description" content="Upload a photo of any letter, bill or form and get a simple explanation in Gujarati, Hindi or English. Powered by open-weight Gemma 4." />
+  <title>Samjan — Intelligent Document Explainer</title>
+  <meta name="description" content="Upload any bill, notice, or letter to get clear answers and scam protection in Gujarati, Hindi, or English. Powered by Gemma 4." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
-      --bg: #0d0f1a;
-      --surface: #161929;
-      --card: #1e2236;
-      --border: #2a2f4a;
-      --accent: #7c6fff;
-      --accent2: #a78bfa;
-      --accent3: #38bdf8;
-      --text: #e8eaf6;
-      --muted: #7b83b0;
-      --success: #34d399;
-      --warn: #fbbf24;
-      --err: #f87171;
-      --risk-low: #34d399;
-      --risk-med: #fbbf24;
-      --risk-high: #f87171;
-      --radius: 14px;
-      --shadow: 0 8px 40px rgba(0,0,0,0.5);
+      --bg: #090b14;
+      --bg-card: rgba(18, 22, 38, 0.72);
+      --bg-card-hover: rgba(26, 31, 54, 0.82);
+      --surface-light: rgba(255, 255, 255, 0.035);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: #6366f1;
+      --accent: #6366f1;
+      --accent-grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --text: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+      --shadow-glow: 0 0 35px -5px rgba(99, 102, 241, 0.25);
     }
+
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 2rem 1rem 6rem;
+      line-height: 1.6;
+      padding: 1.5rem 1rem 5rem;
+      position: relative;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
-    a { color: var(--accent2); }
 
-    /* ── Layout ── */
-    .container { max-width: 680px; margin: 0 auto; }
+    /* Ambient dynamic backdrop glow */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -20%;
+      left: 10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      bottom: -15%;
+      right: 10%;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+      animation: floatOrb2 22s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, 60px) scale(1.15); }
+    }
+
+    @keyframes floatOrb2 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-50px, -40px) scale(1.2); }
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+    }
 
     /* ── Header ── */
-    header { text-align: center; margin-bottom: 2.5rem; }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: var(--radius-full);
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      color: #c7d2fe;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+    }
+
+    .brand-badge .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #818cf8;
+      box-shadow: 0 0 8px #818cf8;
+      animation: pulse 2s infinite;
+    }
+
     header h1 {
-      font-size: 2.6rem; font-weight: 800; letter-spacing: -1px;
-      background: linear-gradient(135deg, var(--accent2) 0%, var(--accent3) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    header p { color: var(--muted); margin-top: .4rem; font-size: .95rem; line-height: 1.6; }
-    .badge {
-      display: inline-block; margin-top: .65rem; font-size: .72rem; font-weight: 600;
-      color: var(--accent2); border: 1px solid var(--border); border-radius: 999px;
-      padding: .22rem .75rem; background: rgba(124,111,255,.1); letter-spacing: .04em; text-transform: uppercase;
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, #ffffff 15%, #cbd5e1 50%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    /* ── Cards ── */
+    header h1 .accent-word {
+      background: var(--accent-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--text-secondary);
+      font-size: 1.02rem;
+      max-width: 520px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    /* ── Glass Card ── */
     .card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 1.75rem; margin-bottom: 1.25rem;
-      box-shadow: var(--shadow);
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.85rem;
+      margin-bottom: 1.35rem;
+      box-shadow: var(--shadow-lg);
+      transition: border-color 0.25s, box-shadow 0.25s;
     }
 
-    /* ── Form elements ── */
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    /* ── Form Controls ── */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
     label {
-      display: block; font-size: .78rem; font-weight: 600; color: var(--muted);
-      margin-bottom: .35rem; letter-spacing: .06em; text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
+
     select, input[type="text"] {
-      width: 100%; background: var(--card); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); padding: .65rem .9rem;
-      font-size: .95rem; font-family: inherit; outline: none;
-      transition: border-color .2s; margin-bottom: 1.2rem;
+      width: 100%;
+      background: rgba(14, 17, 30, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    select:focus, input[type="text"]:focus { border-color: var(--accent); }
 
-    /* ── Drop zone ── */
+    select:focus, input[type="text"]:focus {
+      border-color: var(--border-focus);
+      background: rgba(19, 23, 42, 0.95);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem;
+    }
+
+    /* Suggestion Chips */
+    .chip-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.5rem;
+    }
+
+    .chip {
+      font-size: 0.76rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .chip:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.3);
+      color: #e0e7ff;
+      transform: translateY(-1px);
+    }
+
+    /* ── Drop Zone ── */
     .drop-zone {
-      border: 2px dashed var(--border); border-radius: var(--radius);
-      padding: 2.5rem 1rem; text-align: center; cursor: pointer;
-      transition: border-color .2s, background .2s; position: relative; margin-bottom: 1.2rem;
+      border: 2px dashed rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-md);
+      padding: 2.2rem 1.25rem;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      background: rgba(14, 18, 32, 0.4);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
     }
-    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(124,111,255,.06); }
-    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .drop-zone .icon { font-size: 2rem; margin-bottom: .5rem; }
-    .drop-zone p { color: var(--muted); font-size: .9rem; }
-    .drop-zone .filename { color: var(--accent2); font-size: .82rem; margin-top: .4rem; font-weight: 500; }
 
-    #preview-wrap { display: none; margin-bottom: 1.2rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-    #preview-wrap img { width: 100%; display: block; max-height: 340px; object-fit: contain; background: #111; }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #818cf8;
+      background: rgba(99, 102, 241, 0.08);
+      box-shadow: 0 0 25px rgba(99, 102, 241, 0.12);
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+
+    .drop-icon-wrap {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 0.85rem;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #818cf8;
+      font-size: 1.5rem;
+      transition: transform 0.2s ease;
+    }
+
+    .drop-zone:hover .drop-icon-wrap {
+      transform: scale(1.1);
+    }
+
+    .drop-primary-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .drop-subtext {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.65rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    /* ── Preview with Scanner Effect ── */
+    #preview-wrap {
+      display: none;
+      position: relative;
+      margin-bottom: 1.25rem;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    #preview-wrap img {
+      width: 100%;
+      display: block;
+      max-height: 380px;
+      object-fit: contain;
+      background: #0a0c16;
+    }
+
+    /* Laser scan line active during loading */
+    .scan-line {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent);
+      box-shadow: 0 0 15px 3px rgba(56, 189, 248, 0.65);
+      z-index: 5;
+    }
+
+    .scanning .scan-line {
+      display: block;
+      animation: scanLaser 2s linear infinite;
+    }
+
+    @keyframes scanLaser {
+      0% { top: 0; opacity: 0.8; }
+      50% { top: 100%; opacity: 1; }
+      100% { top: 0; opacity: 0.8; }
+    }
+
+    .preview-clear-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.15s ease;
+      z-index: 6;
+    }
+
+    .preview-clear-btn:hover {
+      background: rgba(244, 63, 94, 0.8);
+      border-color: var(--rose);
+    }
 
     /* ── Buttons ── */
     .btn {
-      width: 100%; padding: .85rem; border: none; border-radius: 10px;
-      font-size: 1rem; font-weight: 600; font-family: inherit;
-      cursor: pointer; transition: opacity .2s, transform .1s;
+      width: 100%;
+      padding: 0.88rem 1.4rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
     }
-    .btn:active { transform: scale(.98); }
-    .btn:disabled { opacity: .45; cursor: not-allowed; }
-    .btn-primary { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; }
+
+    .btn:active {
+      transform: scale(0.985);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .btn-primary {
+      background: var(--accent-grad);
+      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 6px 28px rgba(139, 92, 246, 0.5);
+      transform: translateY(-1px);
+    }
+
     .btn-secondary {
-      background: var(--card); color: var(--muted); border: 1px solid var(--border);
-      margin-top: .6rem; font-size: .85rem; padding: .65rem;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      margin-top: 0.65rem;
+      font-size: 0.88rem;
+      padding: 0.7rem;
     }
-    .btn-sm {
-      padding: .5rem .9rem; border-radius: 8px; font-size: .82rem; font-weight: 600;
-      border: 1px solid var(--border); background: var(--card); color: var(--text);
-      cursor: pointer; transition: background .15s, border-color .15s; font-family: inherit;
-    }
-    .btn-sm:hover { background: var(--border); border-color: var(--accent); }
 
-    /* ── Spinner ── */
-    .spinner {
-      display: inline-block; width: 15px; height: 15px;
-      border: 2px solid rgba(255,255,255,.25); border-top-color: #fff;
-      border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: .5rem;
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.15);
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Dashboard cards ── */
-    .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; margin-bottom: 1.25rem; }
+    .btn-action {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-action:hover:not(:disabled) {
+      background: rgba(99, 102, 241, 0.12);
+      border-color: rgba(99, 102, 241, 0.35);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-action.active {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: #fda4af;
+    }
+
+    /* ── Dashboard Metric Cards ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 580px) {
+      .dash-grid { grid-template-columns: 1fr; }
+    }
+
     .dash-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 1rem .9rem; text-align: center;
+      background: rgba(14, 18, 34, 0.8);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
-    .dash-card .label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .4rem; }
-    .dash-card .value { font-size: 1.05rem; font-weight: 700; color: var(--text); word-break: break-word; }
-    .dash-card .value.amount { color: var(--warn); }
-    .dash-card .value.deadline { color: var(--accent3); }
 
-    /* ── Scam badge ── */
+    .dash-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .dash-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+    }
+
+    .dash-card.type-card::before { background: linear-gradient(90deg, #6366f1, #a855f7); }
+    .dash-card.amount-card::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .dash-card.deadline-card::before { background: linear-gradient(90deg, #06b6d4, #38bdf8); }
+
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .dash-card .label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .dash-icon {
+      font-size: 1.05rem;
+    }
+
+    .dash-card .value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      word-break: break-word;
+      line-height: 1.3;
+    }
+
+    .dash-card .value.amount {
+      color: #fbbf24;
+      font-feature-settings: "tnum";
+    }
+
+    .dash-card .value.deadline {
+      color: #38bdf8;
+    }
+
+    /* ── Scam Risk Alert Box ── */
     .scam-box {
-      border-radius: 10px; padding: .85rem 1.1rem; margin-bottom: 1.25rem;
-      display: flex; align-items: flex-start; gap: .75rem;
+      border-radius: var(--radius-md);
+      padding: 1.2rem 1.35rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
     }
-    .scam-box.low  { background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.3); }
-    .scam-box.medium { background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.3); }
-    .scam-box.high { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.35); }
-    .scam-icon { font-size: 1.5rem; flex-shrink: 0; }
-    .scam-label { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .3rem; }
-    .scam-box.low  .scam-label { color: var(--risk-low); }
-    .scam-box.medium .scam-label { color: var(--risk-med); }
-    .scam-box.high .scam-label { color: var(--risk-high); }
-    .scam-reasons { font-size: .85rem; color: var(--muted); line-height: 1.55; }
-    .scam-reasons li { list-style: none; padding-left: .8rem; position: relative; }
-    .scam-reasons li::before { content: "·"; position: absolute; left: 0; }
 
-    /* ── Action bar ── */
-    .action-bar { display: flex; gap: .65rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
-    .action-bar .btn-sm { flex: 1; min-width: 100px; text-align: center; }
+    .scam-box.low {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+    }
 
-    /* ── Explanation ── */
-    .explanation { font-size: .95rem; line-height: 1.8; color: var(--text); }
-    .explanation strong { color: #fff; }
-    .explanation br + strong, .explanation p strong { color: var(--accent2); }
-    .disclaimer { margin-top: 1rem; font-size: .78rem; color: var(--muted); }
+    .scam-box.medium {
+      background: rgba(245, 158, 11, 0.09);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
 
-    /* ── Chat ── */
+    .scam-box.high {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      animation: alertPulse 3s infinite;
+    }
+
+    @keyframes alertPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+      50% { box-shadow: 0 0 20px 2px rgba(244, 63, 94, 0.2); }
+    }
+
+    .scam-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .scam-box.low .scam-icon-badge { background: rgba(16, 185, 129, 0.15); }
+    .scam-box.medium .scam-icon-badge { background: rgba(245, 158, 11, 0.15); }
+    .scam-box.high .scam-icon-badge { background: rgba(244, 63, 94, 0.2); }
+
+    .scam-content {
+      flex: 1;
+    }
+
+    .scam-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .scam-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .scam-box.low .scam-label { color: #34d399; }
+    .scam-box.medium .scam-label { color: #fbbf24; }
+    .scam-box.high .scam-label { color: #fb7185; }
+
+    /* Meter Bar */
+    .risk-meter {
+      display: flex;
+      gap: 4px;
+      margin: 0.4rem 0 0.6rem;
+      max-width: 180px;
+    }
+
+    .risk-meter-bar {
+      height: 5px;
+      flex: 1;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .scam-box.low .risk-meter-bar:nth-child(1) { background: #10b981; }
+    .scam-box.medium .risk-meter-bar:nth-child(1),
+    .scam-box.medium .risk-meter-bar:nth-child(2) { background: #f59e0b; }
+    .scam-box.high .risk-meter-bar:nth-child(1),
+    .scam-box.high .risk-meter-bar:nth-child(2),
+    .scam-box.high .risk-meter-bar:nth-child(3) { background: #f43f5e; }
+
+    .scam-reasons {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .scam-reasons li {
+      list-style: none;
+      padding-left: 1rem;
+      position: relative;
+      margin-top: 0.2rem;
+    }
+
+    .scam-reasons li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+    }
+
+    /* ── Action Toolbar ── */
+    .action-bar {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .action-bar .btn-action {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    /* Audio wave animation when speaking */
+    .audio-waves {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      height: 14px;
+    }
+
+    .audio-bar {
+      width: 2px;
+      height: 100%;
+      background: currentColor;
+      border-radius: 1px;
+      animation: wave 1s ease-in-out infinite;
+    }
+
+    .audio-bar:nth-child(2) { animation-delay: 0.2s; }
+    .audio-bar:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes wave {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+
+    /* ── Explanation Card ── */
+    .explanation-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .explanation-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: inherit;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .explanation {
+      font-size: 1.02rem;
+      line-height: 1.85;
+      color: #e2e8f0;
+    }
+
+    .explanation strong {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .explanation br + strong, .explanation p strong {
+      color: #a5b4fc;
+    }
+
+    .disclaimer-box {
+      margin-top: 1.25rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Follow-Up Chat ── */
+    .chat-card {
+      margin-top: 1.35rem;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .chat-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #c7d2fe;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
     .chat-history {
-      max-height: 320px; overflow-y: auto; margin-bottom: 1rem;
-      display: flex; flex-direction: column; gap: .75rem;
+      max-height: 340px;
+      overflow-y: auto;
+      margin-bottom: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding-right: 0.4rem;
     }
-    .chat-msg { border-radius: 10px; padding: .7rem .95rem; font-size: .9rem; line-height: 1.6; max-width: 88%; }
-    .chat-msg.user { background: rgba(124,111,255,.15); border: 1px solid rgba(124,111,255,.3); align-self: flex-end; }
-    .chat-msg.bot  { background: var(--card); border: 1px solid var(--border); align-self: flex-start; }
-    .chat-input-row { display: flex; gap: .6rem; }
+
+    .chat-history::-webkit-scrollbar {
+      width: 5px;
+    }
+    .chat-history::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .chat-msg-row {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      max-width: 90%;
+      animation: fadeInMsg 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInMsg {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-msg-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-msg-row.bot {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .avatar.bot {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+    }
+
+    .avatar.user {
+      background: rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+    }
+
+    .chat-bubble {
+      border-radius: 14px;
+      padding: 0.75rem 1.05rem;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .chat-msg-row.user .chat-bubble {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #ffffff;
+      border-top-right-radius: 4px;
+    }
+
+    .chat-msg-row.bot .chat-bubble {
+      background: rgba(22, 26, 44, 0.9);
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+      border-top-left-radius: 4px;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px 6px;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #818cf8;
+      animation: blink 1.2s infinite alternate;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0% { opacity: 0.2; transform: translateY(0); }
+      100% { opacity: 1; transform: translateY(-3px); }
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 0.6rem;
+      background: rgba(14, 18, 32, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.35rem 0.4rem 0.35rem 0.85rem;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input-row:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
     .chat-input-row input {
-      flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text); padding: .6rem .85rem; font-size: .9rem; font-family: inherit; outline: none;
+      flex: 1;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0.5rem 0;
+      font-size: 0.92rem;
     }
-    .chat-input-row input:focus { border-color: var(--accent); }
+
+    .chat-input-row input:focus {
+      border: none;
+      box-shadow: none;
+    }
+
     .chat-input-row button {
-      padding: .6rem 1.1rem; border-radius: 8px; border: none;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff;
-      font-weight: 600; font-size: .9rem; cursor: pointer; font-family: inherit;
-      transition: opacity .2s;
+      padding: 0.6rem 1.15rem;
+      border-radius: 9px;
+      border: none;
+      background: var(--accent-grad);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
     }
-    .chat-input-row button:disabled { opacity: .5; }
 
-    /* ── Alert ── */
-    .alert { border-radius: 8px; padding: .75rem 1rem; font-size: .9rem; }
-    .alert-err { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); color: var(--err); }
+    .chat-input-row button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
 
-    /* ── No key banner ── */
+    /* ── Alerts & Banners ── */
+    .alert {
+      border-radius: 10px;
+      padding: 0.85rem 1.15rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert-err {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+
     .no-key-banner {
-      background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.3);
-      color: var(--err); border-radius: 10px; padding: 1rem 1.25rem;
-      font-size: .9rem; margin-bottom: 1.5rem;
+      background: rgba(244, 63, 94, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fca5a5;
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.35rem;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
     }
-    .no-key-banner code { background: rgba(0,0,0,.3); border-radius: 4px; padding: .1rem .4rem; }
 
-    #result-section { display: none; }
-    #chat-section { display: none; margin-top: 1.25rem; }
+    .no-key-banner code {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      padding: 0.15rem 0.45rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    .no-key-banner a {
+      color: #93c5fd;
+      text-decoration: underline;
+    }
+
+    /* ── Utilities & Animations ── */
+    .spinner {
+      display: inline-block;
+      width: 17px;
+      height: 17px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    #result-section {
+      display: none;
+      animation: fadeInSection 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #chat-section {
+      display: none;
+    }
+
+    @keyframes fadeInSection {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
 <div class="container">
 
+  <!-- ── Header ── -->
   <header>
-    <h1>📄 Samjan</h1>
-    <p>Photo of a letter, bill or form in.<br>Simple explanation out, in your language.</p>
-    <span class="badge">Powered by open-weight Gemma 4</span>
+    <div class="brand-badge">
+      <span class="pulse-dot"></span>
+      Powered by Open-Weight Gemma 4
+    </div>
+    <h1>Samjan <span class="accent-word">સમજણ</span></h1>
+    <p>Snap a photo of any letter, bill, or government notice. Get a crystal-clear explanation and scam check in your language.</p>
   </header>
 
   {% if not has_key %}
   <div class="no-key-banner">
-    <strong>⚠ API key not found.</strong> Create a <code>.env</code> file with
-    <code>GEMINI_API_KEY=your_key</code> and restart.
-    Get a free key at <a href="https://aistudio.google.com">aistudio.google.com</a>.
+    <div style="font-size:1.3rem;">⚠️</div>
+    <div>
+      <strong>API Key Not Detected:</strong> Create a <code>.env</code> file in the app folder with
+      <code>GEMINI_API_KEY=your_key</code> and restart.
+      Get a free key from <a href="https://aistudio.google.com" target="_blank" rel="noopener">Google AI Studio</a>.
+    </div>
   </div>
   {% endif %}
 
-  <!-- ── Upload card ── -->
+  <!-- ── Upload Card ── -->
   <div class="card">
-    <label for="lang">Explain in</label>
-    <select id="lang">
-      <option>Gujarati</option>
-      <option>Hindi</option>
-      <option selected>English</option>
-    </select>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="lang">🌐 Explain in Language</label>
+        <select id="lang">
+          <option value="Gujarati">ગુજરાતી (Gujarati)</option>
+          <option value="Hindi">हिंदी (Hindi)</option>
+          <option value="English" selected>English</option>
+        </select>
+      </div>
 
-    <label for="question">Optional question</label>
-    <input type="text" id="question" placeholder="e.g. How much do I owe?" />
-
-    <label>Document photo</label>
-    <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg" />
-      <div class="icon">📎</div>
-      <p>Drop a photo here or click to browse</p>
-      <div class="filename" id="filename"></div>
+      <div class="form-group">
+        <label for="question">❓ Specific Question (Optional)</label>
+        <input type="text" id="question" placeholder="e.g. How much do I owe? When to pay?" />
+      </div>
     </div>
 
-    <div id="preview-wrap"><img id="preview" src="" alt="Preview" /></div>
+    <!-- Quick Question Chips -->
+    <div style="margin-top:-0.5rem; margin-bottom:1.25rem;">
+      <div class="chip-container">
+        <span class="chip" onclick="setQuestion('How much do I owe and what is the deadline?')">💰 Amount & Deadline?</span>
+        <span class="chip" onclick="setQuestion('Is this document a scam or fake notice?')">🛡️ Is it a fake notice?</span>
+        <span class="chip" onclick="setQuestion('How can I pay or resolve this?')">💳 How to pay?</span>
+        <span class="chip" onclick="setQuestion('What happens if I miss the due date?')">⚠️ If I miss the date?</span>
+      </div>
+    </div>
 
+    <!-- Drop Zone -->
+    <div class="form-group">
+      <label>📸 Document Photo</label>
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg,image/webp" capture="environment" />
+        <div class="drop-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="drop-primary-text">Drag & drop your document here, or click to browse</div>
+        <div class="drop-subtext">Supports PNG, JPG, or screenshot pasted with Ctrl+V</div>
+        <div id="file-badge-wrap" style="display:none;">
+          <span class="file-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="filename"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Container with Laser Scan effect -->
+    <div id="preview-wrap">
+      <div class="scan-line"></div>
+      <button class="preview-clear-btn" id="clear-preview" title="Remove image">✕</button>
+      <img id="preview" src="" alt="Document Preview" />
+    </div>
+
+    <!-- Primary Actions -->
     <button class="btn btn-primary" id="explain-btn" {% if not has_key %}disabled{% endif %}>
-      Explain this document
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+      <span>Explain this document</span>
     </button>
-    <button class="btn btn-secondary" id="sample-btn">Try a sample electricity bill</button>
+    <button class="btn btn-secondary" id="sample-btn" type="button">
+      <span>📄 Try with a sample electricity bill</span>
+    </button>
   </div>
 
-  <!-- ── Results ── -->
+  <!-- ── Results Section ── -->
   <div id="result-section">
 
-    <!-- Dashboard cards -->
+    <!-- Dashboard Key Metrics -->
     <div class="dash-grid">
-      <div class="dash-card">
-        <div class="label">Document type</div>
+      <div class="dash-card type-card">
+        <div class="dash-header">
+          <span class="label">Document Type</span>
+          <span class="dash-icon">📑</span>
+        </div>
         <div class="value" id="dash-type">—</div>
       </div>
-      <div class="dash-card">
-        <div class="label">Amount due</div>
+      <div class="dash-card amount-card">
+        <div class="dash-header">
+          <span class="label">Amount Due</span>
+          <span class="dash-icon">💰</span>
+        </div>
         <div class="value amount" id="dash-amount">—</div>
       </div>
-      <div class="dash-card">
-        <div class="label">Deadline</div>
+      <div class="dash-card deadline-card">
+        <div class="dash-header">
+          <span class="label">Due Date</span>
+          <span class="dash-icon">📅</span>
+        </div>
         <div class="value deadline" id="dash-deadline">—</div>
       </div>
     </div>
 
-    <!-- Scam risk -->
+    <!-- Scam Risk Evaluation -->
     <div class="scam-box" id="scam-box">
-      <div class="scam-icon" id="scam-icon">🛡️</div>
-      <div>
-        <div class="scam-label" id="scam-label">Scam risk</div>
+      <div class="scam-icon-badge" id="scam-icon">🛡️</div>
+      <div class="scam-content">
+        <div class="scam-title-row">
+          <div class="scam-label" id="scam-label">Scam Risk Assessment</div>
+        </div>
+        <div class="risk-meter">
+          <div class="risk-meter-bar"></div>
+          <div class="risk-meter-bar"></div>
+          <div class="risk-meter-bar"></div>
+        </div>
         <ul class="scam-reasons" id="scam-reasons"></ul>
       </div>
     </div>
 
-    <!-- Action bar -->
+    <!-- Quick Action Bar -->
     <div class="action-bar">
-      <button class="btn-sm" id="speak-btn">🔊 Read aloud</button>
-      <button class="btn-sm" id="ics-btn" disabled>📅 Add to calendar</button>
-      <button class="btn-sm" id="wa-btn">📱 WhatsApp share</button>
+      <button class="btn-action" id="speak-btn">
+        <span id="speak-icon">🔊</span>
+        <span id="speak-label">Read aloud</span>
+        <span class="audio-waves" id="speak-waves" style="display:none;">
+          <span class="audio-bar"></span>
+          <span class="audio-bar"></span>
+          <span class="audio-bar"></span>
+        </span>
+      </button>
+
+      <button class="btn-action" id="ics-btn" disabled>
+        <span>📅</span>
+        <span>Add to calendar</span>
+      </button>
+
+      <button class="btn-action" id="wa-btn">
+        <span>💬</span>
+        <span>Share to WhatsApp</span>
+      </button>
     </div>
 
-    <!-- Full explanation -->
+    <!-- Main Explanation Card -->
     <div class="card">
+      <div class="explanation-header">
+        <div class="explanation-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Plain-Language Explanation
+        </div>
+        <button class="copy-btn" id="copy-btn" title="Copy text">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="copy-label">Copy</span>
+        </button>
+      </div>
+
       <div class="explanation" id="explanation-content"></div>
-      <p class="disclaimer">⚠️ AI can make mistakes. Check important details with the sender or an official office.</p>
+
+      <div class="disclaimer-box">
+        <span>⚠️</span>
+        <span>AI can make mistakes. Always verify critical payments and deadlines with official agencies.</span>
+      </div>
     </div>
 
-    <!-- Follow-up chat -->
-    <div id="chat-section" class="card">
-      <label style="margin-bottom:.85rem;display:block;font-size:.85rem;color:var(--accent2);font-weight:600;">
-        💬 Ask a follow-up question
-      </label>
+    <!-- Follow-up Chat Card -->
+    <div id="chat-section" class="card chat-card">
+      <div class="chat-header">
+        <div class="chat-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          Ask Follow-Up Questions
+        </div>
+      </div>
       <div class="chat-history" id="chat-history"></div>
       <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="Can I pay online? What if I miss the date?" />
-        <button id="chat-send" disabled>Send</button>
+        <input type="text" id="chat-input" placeholder="Ask anything, e.g. Where can I pay this online?" />
+        <button id="chat-send" disabled>
+          <span>Send</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
     </div>
 
   </div><!-- /result-section -->
+
+  <footer>
+    <p>Samjan • Empowering Indian citizens with open-source AI • Built with Gemma 4</p>
+  </footer>
 
 </div><!-- /container -->
 
 <script>
   // ── State ──────────────────────────────────────────────────────────────────
   let selectedFile = null;
-  let lastResult   = null;   // full JSON from /explain
+  let lastResult   = null;
   let speaking     = false;
 
-  // ── DOM refs ───────────────────────────────────────────────────────────────
+  // ── DOM References ─────────────────────────────────────────────────────────
   const fileInput      = document.getElementById('file-input');
   const dropZone       = document.getElementById('drop-zone');
-  const preview        = document.getElementById('preview');
   const previewWrap    = document.getElementById('preview-wrap');
+  const preview        = document.getElementById('preview');
+  const clearPreview   = document.getElementById('clear-preview');
+  const fileBadgeWrap  = document.getElementById('file-badge-wrap');
   const filenameEl     = document.getElementById('filename');
   const explainBtn     = document.getElementById('explain-btn');
   const sampleBtn      = document.getElementById('sample-btn');
@@ -319,41 +1296,102 @@
   const scamLabel    = document.getElementById('scam-label');
   const scamReasons  = document.getElementById('scam-reasons');
   const exContent    = document.getElementById('explanation-content');
+  const copyBtn      = document.getElementById('copy-btn');
+  const copyLabel    = document.getElementById('copy-label');
 
-  const speakBtn = document.getElementById('speak-btn');
-  const icsBtn   = document.getElementById('ics-btn');
-  const waBtn    = document.getElementById('wa-btn');
+  const speakBtn     = document.getElementById('speak-btn');
+  const speakIcon    = document.getElementById('speak-icon');
+  const speakLabel   = document.getElementById('speak-label');
+  const speakWaves   = document.getElementById('speak-waves');
+  const icsBtn       = document.getElementById('ics-btn');
+  const waBtn        = document.getElementById('wa-btn');
 
-  const chatSection = document.getElementById('chat-section');
-  const chatHistory = document.getElementById('chat-history');
-  const chatInput   = document.getElementById('chat-input');
-  const chatSend    = document.getElementById('chat-send');
+  const chatSection  = document.getElementById('chat-section');
+  const chatHistory  = document.getElementById('chat-history');
+  const chatInput    = document.getElementById('chat-input');
+  const chatSend     = document.getElementById('chat-send');
 
-  // ── Drag-and-drop ──────────────────────────────────────────────────────────
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  // ── Quick chips helper ─────────────────────────────────────────────────────
+  window.setQuestion = function(q) {
+    const input = document.getElementById('question');
+    input.value = q;
+    input.focus();
+  };
+
+  // ── Drag & Drop & Paste Support ────────────────────────────────────────────
+  dropZone.addEventListener('dragover', e => { 
+    e.preventDefault(); 
+    dropZone.classList.add('drag-over'); 
+  });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+  dropZone.addEventListener('drop', e => { 
+    e.preventDefault(); 
+    dropZone.classList.remove('drag-over'); 
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]); 
+    }
+  });
   fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+  // Clipboard Paste support (Ctrl+V)
+  window.addEventListener('paste', e => {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    for (let item of items) {
+      if (item.kind === 'file' && item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        handleFile(file);
+        break;
+      }
+    }
+  });
 
   function handleFile(file) {
     if (!file) return;
     selectedFile = file;
-    filenameEl.textContent = file.name;
+    filenameEl.textContent = file.name || 'Pasted Image.png';
+    fileBadgeWrap.style.display = 'block';
+
     const reader = new FileReader();
-    reader.onload = e => { preview.src = e.target.result; previewWrap.style.display = 'block'; };
+    reader.onload = e => { 
+      preview.src = e.target.result; 
+      previewWrap.style.display = 'block'; 
+    };
     reader.readAsDataURL(file);
   }
 
-  // ── Sample bill ────────────────────────────────────────────────────────────
-  sampleBtn.addEventListener('click', async () => {
-    const resp = await fetch('/sample');
-    const blob = await resp.blob();
-    handleFile(new File([blob], 'sample_bill.png', { type: 'image/png' }));
+  clearPreview.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectedFile = null;
+    fileInput.value = '';
+    preview.src = '';
+    previewWrap.style.display = 'none';
+    fileBadgeWrap.style.display = 'none';
+    filenameEl.textContent = '';
   });
 
-  // ── Explain ────────────────────────────────────────────────────────────────
+  // ── Sample Bill Loader ─────────────────────────────────────────────────────
+  sampleBtn.addEventListener('click', async () => {
+    sampleBtn.disabled = true;
+    sampleBtn.innerHTML = '<span class="spinner"></span> Loading sample bill…';
+    try {
+      const resp = await fetch('/sample');
+      const blob = await resp.blob();
+      handleFile(new File([blob], 'sample_electricity_bill.png', { type: 'image/png' }));
+    } catch (err) {
+      alert('Error fetching sample: ' + err.message);
+    } finally {
+      sampleBtn.disabled = false;
+      sampleBtn.innerHTML = '<span>📄 Try with a sample electricity bill</span>';
+    }
+  });
+
+  // ── Explain Execution ──────────────────────────────────────────────────────
   explainBtn.addEventListener('click', async () => {
-    if (!selectedFile) { alert('Please upload or select a document photo first.'); return; }
+    if (!selectedFile) {
+      alert('Please upload or select a document photo first.');
+      return;
+    }
+    
     setLoading(true);
     resultSection.style.display = 'none';
     chatSection.style.display = 'none';
@@ -367,7 +1405,8 @@
       const resp = await fetch('/explain', { method: 'POST', body: form });
       const data = await resp.json();
       if (data.error) {
-        showError(data.error); return;
+        showError(data.error);
+        return;
       }
       lastResult = data;
       renderResult(data);
@@ -380,64 +1419,114 @@
 
   function setLoading(on) {
     explainBtn.disabled = on;
-    explainBtn.innerHTML = on ? '<span class="spinner"></span>Reading the document…' : 'Explain this document';
+    if (on) {
+      explainBtn.innerHTML = '<span class="spinner"></span> Reading & analyzing document…';
+      previewWrap.classList.add('scanning');
+    } else {
+      explainBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        <span>Explain this document</span>
+      `;
+      previewWrap.classList.remove('scanning');
+    }
   }
 
   function showError(msg) {
     resultSection.style.display = 'block';
-    exContent.innerHTML = `<div class="alert alert-err">${msg}</div>`;
+    exContent.innerHTML = `<div class="alert alert-err"><span>⚠️</span><span>${msg}</span></div>`;
     dashType.textContent = dashAmount.textContent = dashDeadline.textContent = '—';
     scamBox.className = 'scam-box low';
     scamReasons.innerHTML = '';
   }
 
-  // ── Render result ──────────────────────────────────────────────────────────
+  // ── Render Structured Results ──────────────────────────────────────────────
   function renderResult(d) {
-    // Dashboard cards
-    dashType.textContent     = d.type     || '—';
-    dashAmount.textContent   = d.amount   || '—';
-    dashDeadline.textContent = d.deadline_display || d.deadline || '—';
+    // 1. Dashboard Metrics
+    dashType.textContent     = d.type     || 'General Document';
+    dashAmount.textContent   = d.amount   || 'None';
+    dashDeadline.textContent = d.deadline_display || d.deadline || 'No Deadline';
 
-    // Scam box
+    // 2. Scam Risk Box
     const risk = (d.scam_risk || 'low').toLowerCase();
     const icons = { low: '🛡️', medium: '⚠️', high: '🚨' };
-    const labels = { low: 'Low scam risk', medium: 'Medium scam risk', high: 'High scam risk — be careful!' };
-    scamBox.className = 'scam-box ' + risk;
+    const labels = { 
+      low: 'Low Scam Risk — Document appears authentic', 
+      medium: 'Medium Scam Risk — Verify with caution', 
+      high: 'High Scam Risk — Potential Fraud or Scam!' 
+    };
+
+    scamBox.className = 'scam-box ' + (['low','medium','high'].includes(risk) ? risk : 'low');
     scamIcon.textContent = icons[risk] || '🛡️';
-    scamLabel.textContent = labels[risk] || 'Scam risk';
-    scamReasons.innerHTML = (d.scam_reasons || []).map(r => `<li>${r}</li>`).join('');
+    scamLabel.textContent = labels[risk] || 'Scam Risk Assessment';
+    
+    if (d.scam_reasons && d.scam_reasons.length > 0) {
+      scamReasons.innerHTML = d.scam_reasons.map(r => `<li>${r}</li>`).join('');
+    } else {
+      scamReasons.innerHTML = '<li>No suspicious red flags or urgency traps identified.</li>';
+    }
 
-    // Explanation
-    exContent.innerHTML = md(d.explanation || '');
+    // 3. Explanation Markdown
+    exContent.innerHTML = md(d.explanation || 'No explanation generated.');
 
-    // Action buttons
-    icsBtn.disabled = !d.deadline || d.deadline === 'N/A';
+    // 4. Action Buttons
+    const hasDeadline = d.deadline && d.deadline !== 'N/A' && d.deadline.trim() !== '';
+    icsBtn.disabled = !hasDeadline;
     waBtn.onclick = () => shareWhatsApp(d);
     icsBtn.onclick = () => downloadIcs(d);
 
+    // Reset Voice Read Aloud if active
+    if (speaking) {
+      speechSynthesis.cancel();
+      resetSpeechBtn();
+    }
+
+    // Show sections
     resultSection.style.display = 'block';
     chatSection.style.display = 'block';
     chatSend.disabled = false;
     chatHistory.innerHTML = '';
-    resultSection.scrollIntoView({ behavior: 'smooth' });
+    
+    // Add introductory bot greeting to chat
+    appendMsg('Feel free to ask any follow-up questions about this document (e.g. where to pay, what to check, or clarification on terms).', 'bot');
+
+    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ── Minimal Markdown renderer ──────────────────────────────────────────────
+  // ── Markdown Parser ────────────────────────────────────────────────────────
   function md(text) {
     return text
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^#{1,3}\s+(.+)$/gm, '<strong style="color:var(--accent2);font-size:1rem;display:block;margin-top:.85rem;margin-bottom:.3rem">$1</strong>')
-      .replace(/^(\d+)\.\s+/gm, '<br><strong style="color:var(--accent2)">$1.</strong> ')
+      .replace(/^#{1,3}\s+(.+)$/gm, '<strong style="color:#c7d2fe;font-size:1.05rem;display:block;margin-top:1rem;margin-bottom:0.35rem">$1</strong>')
+      .replace(/^(\d+)\.\s+/gm, '<br><strong style="color:#818cf8">$1.</strong> ')
       .replace(/^[-*]\s+/gm, '<br>• ')
       .replace(/\n/g, '<br>');
   }
 
-  // ── Read aloud (Web Speech API) ────────────────────────────────────────────
+  // ── Copy Explanation ───────────────────────────────────────────────────────
+  copyBtn.addEventListener('click', async () => {
+    if (!lastResult || !lastResult.explanation) return;
+    const plainText = lastResult.explanation.replace(/<[^>]+>/g, '').replace(/[*#`]/g, '');
+    try {
+      await navigator.clipboard.writeText(plainText);
+      copyLabel.textContent = 'Copied!';
+      setTimeout(() => { copyLabel.textContent = 'Copy'; }, 2000);
+    } catch (e) {
+      copyLabel.textContent = 'Failed';
+    }
+  });
+
+  // ── Read Aloud (Web Speech API) ────────────────────────────────────────────
   speakBtn.addEventListener('click', () => {
     if (!lastResult) return;
-    if (speaking) { speechSynthesis.cancel(); speaking = false; speakBtn.textContent = '🔊 Read aloud'; return; }
+    if (speaking) {
+      speechSynthesis.cancel();
+      resetSpeechBtn();
+      return;
+    }
 
     const lang = document.getElementById('lang').value;
     const langMap = { Gujarati: 'gu-IN', Hindi: 'hi-IN', English: 'en-IN' };
@@ -445,41 +1534,67 @@
 
     const utt = new SpeechSynthesisUtterance(plainText);
     utt.lang = langMap[lang] || 'en-IN';
-    // Try to find a matching voice
+    
     const voices = speechSynthesis.getVoices();
-    const match = voices.find(v => v.lang.startsWith(utt.lang.slice(0,2)));
+    const match = voices.find(v => v.lang.startsWith(utt.lang.slice(0, 2)));
     if (match) utt.voice = match;
-    utt.rate = 0.92;
-    utt.onend = () => { speaking = false; speakBtn.textContent = '🔊 Read aloud'; };
-    utt.onerror = () => { speaking = false; speakBtn.textContent = '🔊 Read aloud'; };
+    utt.rate = 0.95;
+
+    utt.onend = resetSpeechBtn;
+    utt.onerror = resetSpeechBtn;
 
     speechSynthesis.speak(utt);
     speaking = true;
-    speakBtn.textContent = '⏹ Stop reading';
+    speakBtn.classList.add('active');
+    speakIcon.textContent = '⏹';
+    speakLabel.textContent = 'Stop reading';
+    speakWaves.style.display = 'inline-flex';
   });
 
-  // ── Calendar .ics ──────────────────────────────────────────────────────────
-  async function downloadIcs(d) {
-    const resp = await fetch('/ics', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ deadline: d.deadline, type: d.type, amount: d.amount })
-    });
-    if (!resp.ok) { alert('Could not create calendar file.'); return; }
-    const blob = await resp.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'reminder.ics'; a.click();
-    URL.revokeObjectURL(url);
+  function resetSpeechBtn() {
+    speaking = false;
+    speakBtn.classList.remove('active');
+    speakIcon.textContent = '🔊';
+    speakLabel.textContent = 'Read aloud';
+    speakWaves.style.display = 'none';
   }
 
-  // ── WhatsApp share ─────────────────────────────────────────────────────────
+  // ── Calendar (.ics) Download ───────────────────────────────────────────────
+  async function downloadIcs(d) {
+    const originalText = icsBtn.innerHTML;
+    icsBtn.innerHTML = '<span>⏳ Creating…</span>';
+    icsBtn.disabled = true;
+
+    try {
+      const resp = await fetch('/ics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deadline: d.deadline, type: d.type, amount: d.amount })
+      });
+      if (!resp.ok) throw new Error('Could not create calendar file.');
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `deadline_${(d.type || 'reminder').replace(/\s+/g, '_')}.ics`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      icsBtn.innerHTML = originalText;
+      icsBtn.disabled = false;
+    }
+  }
+
+  // ── WhatsApp Share ─────────────────────────────────────────────────────────
   function shareWhatsApp(d) {
     const plain = (d.explanation || '').replace(/<[^>]+>/g, '').replace(/[*#`]/g, '').trim();
-    const msg = `📄 *${d.type}*\n💰 Amount: ${d.amount}\n📅 Deadline: ${d.deadline_display || d.deadline}\n🛡️ Scam risk: ${d.scam_risk}\n\n${plain.slice(0, 600)}…\n\n_Explained by Samjan (Gemma 4)_`;
+    const msg = `📑 *${d.type}*\n💰 Amount Due: ${d.amount}\n📅 Deadline: ${d.deadline_display || d.deadline}\n🛡️ Scam Risk: ${d.scam_risk}\n\n${plain.slice(0, 500)}…\n\n_Explained by Samjan (Gemma 4)_`;
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   }
 
-  // ── Follow-up chat ─────────────────────────────────────────────────────────
+  // ── Follow-Up Chat ─────────────────────────────────────────────────────────
   chatSend.addEventListener('click', sendChat);
   chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
 
@@ -491,7 +1606,7 @@
     chatInput.value = '';
     chatSend.disabled = true;
 
-    const thinkEl = appendMsg('…', 'bot');
+    const thinkingRow = appendTypingIndicator();
 
     try {
       const resp = await fetch('/chat', {
@@ -504,9 +1619,11 @@
         })
       });
       const data = await resp.json();
-      thinkEl.innerHTML = md(data.answer || data.error || 'No response.');
+      thinkingRow.remove();
+      appendMsg(md(data.answer || data.error || 'No response received.'), 'bot');
     } catch (e) {
-      thinkEl.innerHTML = 'Network error: ' + e.message;
+      thinkingRow.remove();
+      appendMsg('Network error: ' + e.message, 'bot');
     } finally {
       chatSend.disabled = false;
       chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -514,12 +1631,41 @@
   }
 
   function appendMsg(text, role) {
-    const el = document.createElement('div');
-    el.className = 'chat-msg ' + role;
-    el.innerHTML = text;
-    chatHistory.appendChild(el);
+    const row = document.createElement('div');
+    row.className = 'chat-msg-row ' + role;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar ' + role;
+    avatar.textContent = role === 'bot' ? '✦' : '👤';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = text;
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    chatHistory.appendChild(row);
     chatHistory.scrollTop = chatHistory.scrollHeight;
-    return el;
+    return bubble;
+  }
+
+  function appendTypingIndicator() {
+    const row = document.createElement('div');
+    row.className = 'chat-msg-row bot';
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar bot';
+    avatar.textContent = '✦';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    chatHistory.appendChild(row);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    return row;
   }
 </script>
 </body>
