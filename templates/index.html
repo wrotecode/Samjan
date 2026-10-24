@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samjan — Official Document Verification & Explanation</title>
+  <title>Samjan — Document Verification & Plain-Language Explainer</title>
   <meta name="description" content="Verified explanation and fraud detection for letters, bills, and official notices in Gujarati, Hindi, and English. Powered by Gemma 4." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      /* Banham-inspired Authority & Security Palette */
-      --bg-deep: #0a0e17;
-      --bg-surface: #101623;
-      --bg-surface-elevated: #161e2e;
-      --border-subtle: #1e293b;
-      --border-strong: #334155;
+      /* Sophisticated Nordic & Security Slate Palette */
+      --bg-deep: #0b0f19;
+      --bg-surface: #111827;
+      --bg-surface-elevated: #172033;
+      --border-subtle: #1f293d;
+      --border-strong: #2c3a54;
       
-      /* Signature Banham Gold & Accents - Zero Purple */
-      --gold: #f59e0b;
-      --gold-hover: #d97706;
-      --gold-muted: rgba(245, 158, 11, 0.12);
-      --gold-border: rgba(245, 158, 11, 0.35);
+      /* Refined Warm Champagne Gold */
+      --accent-gold: #e5a93c;
+      --accent-gold-hover: #cf932b;
+      --accent-gold-muted: rgba(229, 169, 60, 0.12);
+      --accent-gold-border: rgba(229, 169, 60, 0.35);
       
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
@@ -45,7 +45,7 @@
       --radius-md: 10px;
       --radius-lg: 14px;
       
-      --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+      --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
     }
 
     body {
@@ -59,18 +59,18 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Top Security Header Bar ── */
+    /* ── Top Navigation Bar ── */
     .site-nav {
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 0.9rem 1.5rem;
+      padding: 0.95rem 1.5rem;
       position: sticky;
       top: 0;
       z-index: 50;
     }
 
     .nav-inner {
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -88,21 +88,20 @@
     .brand-mark {
       width: 32px;
       height: 32px;
-      background: var(--gold);
+      background: var(--accent-gold);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #0a0e17;
-      font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: -0.05em;
+      color: #0b0f19;
+      font-weight: 900;
+      font-size: 1.1rem;
     }
 
     .brand-title {
       font-weight: 800;
       font-size: 1.15rem;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       display: flex;
       align-items: baseline;
@@ -111,7 +110,7 @@
 
     .brand-subtitle {
       font-size: 0.72rem;
-      color: var(--gold);
+      color: var(--accent-gold);
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -143,20 +142,20 @@
 
     .nav-btn:hover {
       background: var(--border-subtle);
-      border-color: var(--gold);
+      border-color: var(--accent-gold);
     }
 
     .nav-btn-gold {
-      background: var(--gold);
-      color: #0a0e17;
-      border-color: var(--gold);
+      background: var(--accent-gold);
+      color: #0b0f19;
+      border-color: var(--accent-gold);
       font-weight: 700;
     }
 
     .nav-btn-gold:hover {
-      background: var(--gold-hover);
-      color: #0a0e17;
-      border-color: var(--gold-hover);
+      background: var(--accent-gold-hover);
+      color: #0b0f19;
+      border-color: var(--accent-gold-hover);
     }
 
     .user-tag {
@@ -173,8 +172,8 @@
     }
 
     .count-tag {
-      background: var(--gold);
-      color: #0a0e17;
+      background: var(--accent-gold);
+      color: #0b0f19;
       padding: 0.05rem 0.45rem;
       border-radius: 4px;
       font-size: 0.72rem;
@@ -183,44 +182,104 @@
 
     /* ── Main Container ── */
     .container {
-      max-width: 760px;
-      margin: 2.2rem auto 0;
-      padding: 0 1rem;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
     }
 
-    /* ── Editorial Hero ── */
-    .hero-panel {
+    /* ── Clean Landing Hero ── */
+    .landing-hero {
+      padding: 4rem 0 2.5rem;
       border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 1.75rem;
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
     }
 
-    .hero-kicker {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.5rem;
+    .hero-title-wrap {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
     }
 
-    .hero-panel h1 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-      color: #ffffff;
-      margin-bottom: 0.65rem;
+    .hero-heading {
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--accent-gold);
+      display: inline-block;
     }
 
-    .hero-panel p {
-      font-size: 0.98rem;
+    @media (max-width: 650px) {
+      .hero-heading { font-size: 2.8rem; }
+    }
+
+    .typewriter-cursor {
+      display: inline-block;
+      color: var(--accent-gold);
+      font-weight: 300;
+      margin-left: 4px;
+      animation: cursorBlink 0.9s infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .hero-description {
+      font-size: 1.05rem;
       color: var(--text-muted);
-      max-width: 620px;
-      line-height: 1.6;
+      max-width: 650px;
+      line-height: 1.65;
+      margin-bottom: 1.85rem;
     }
 
-    /* ── Standard Solid Card ── */
+    .hero-cta-row {
+      display: flex;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-cta-btn {
+      padding: 0.85rem 1.65rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .hero-cta-primary {
+      background: var(--accent-gold);
+      color: #0b0f19;
+      border: 1px solid var(--accent-gold);
+    }
+
+    .hero-cta-primary:hover {
+      background: var(--accent-gold-hover);
+      border-color: var(--accent-gold-hover);
+    }
+
+    .hero-cta-secondary {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+    }
+
+    .hero-cta-secondary:hover {
+      border-color: var(--accent-gold);
+      color: #fff;
+    }
+
+    /* ── Solid Verification Card ── */
     .card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
@@ -287,7 +346,7 @@
     }
 
     select:focus, input[type="text"]:focus, input[type="password"]:focus {
-      border-color: var(--gold);
+      border-color: var(--accent-gold);
     }
 
     select {
@@ -309,12 +368,12 @@
       cursor: pointer;
       position: relative;
       background: var(--bg-surface-elevated);
-      transition: border-color 0.15s ease, background-color 0.15s ease;
+      transition: border-color 0.15s ease;
     }
 
     .drop-zone:hover, .drop-zone.drag-over {
-      border-color: var(--gold);
-      background: rgba(245, 158, 11, 0.03);
+      border-color: var(--accent-gold);
+      background: rgba(229, 169, 60, 0.04);
     }
 
     .drop-zone input[type="file"] {
@@ -329,7 +388,7 @@
 
     .drop-icon {
       font-size: 1.5rem;
-      color: var(--gold);
+      color: var(--accent-gold);
       margin-bottom: 0.5rem;
     }
 
@@ -353,8 +412,8 @@
       padding: 0.35rem 0.85rem;
       border-radius: var(--radius-sm);
       background: var(--bg-surface);
-      border: 1px solid var(--gold-border);
-      color: var(--gold);
+      border: 1px solid var(--accent-gold-border);
+      color: var(--accent-gold);
       font-size: 0.82rem;
       font-weight: 600;
     }
@@ -403,7 +462,7 @@
       color: #fff;
     }
 
-    /* ── Primary Action Buttons ── */
+    /* ── Action Buttons ── */
     .btn {
       width: 100%;
       padding: 0.9rem 1.4rem;
@@ -427,14 +486,14 @@
     }
 
     .btn-gold {
-      background: var(--gold);
-      color: #0a0e17;
-      border: 1px solid var(--gold);
+      background: var(--accent-gold);
+      color: #0b0f19;
+      border: 1px solid var(--accent-gold);
     }
 
     .btn-gold:hover:not(:disabled) {
-      background: var(--gold-hover);
-      border-color: var(--gold-hover);
+      background: var(--accent-gold-hover);
+      border-color: var(--accent-gold-hover);
     }
 
     .btn-outline {
@@ -470,7 +529,7 @@
     }
 
     .btn-action:hover:not(:disabled) {
-      border-color: var(--gold);
+      border-color: var(--accent-gold);
       color: #fff;
     }
 
@@ -496,7 +555,7 @@
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
       padding: 1.25rem 1.15rem;
-      border-left: 3px solid var(--gold);
+      border-left: 3px solid var(--accent-gold);
     }
 
     .metric-label {
@@ -516,7 +575,7 @@
       word-break: break-word;
     }
 
-    .metric-value.amount { color: var(--gold); }
+    .metric-value.amount { color: var(--accent-gold); }
 
     /* ── Scam Assessment Banner ── */
     .security-check-card {
@@ -606,7 +665,7 @@
     }
 
     .explanation-body br + strong, .explanation-body p strong {
-      color: var(--gold);
+      color: var(--accent-gold);
     }
 
     .official-disclaimer {
@@ -663,7 +722,7 @@
 
     .chat-bubble-row.user .chat-bubble {
       background: var(--bg-surface-elevated);
-      border: 1px solid var(--gold-border);
+      border: 1px solid var(--accent-gold-border);
       color: var(--text-main);
     }
 
@@ -684,8 +743,8 @@
 
     .chat-input-row button {
       padding: 0.65rem 1.35rem;
-      background: var(--gold);
-      color: #0a0e17;
+      background: var(--accent-gold);
+      color: #0b0f19;
       font-weight: 700;
       border: none;
       border-radius: var(--radius-sm);
@@ -751,7 +810,7 @@
     }
 
     .modal-tab.active {
-      color: var(--gold);
+      color: var(--accent-gold);
     }
 
     .modal-tab.active::after {
@@ -761,7 +820,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--gold);
+      background: var(--accent-gold);
     }
 
     /* ── History Drawer ── */
@@ -826,7 +885,7 @@
     }
 
     .history-card:hover {
-      border-color: var(--gold);
+      border-color: var(--accent-gold);
     }
 
     .history-top {
@@ -950,12 +1009,28 @@
   <!-- ── Main Content Container ── -->
   <main class="container">
 
-    <!-- Editorial Header (No AI Slop / No Purple) -->
-    <div class="hero-panel">
-      <div class="hero-kicker">Security & Verification Services</div>
-      <h1>Official Notice & Bill Explainer</h1>
-      <p>Submit any utility bill, tax document, court notice, or government correspondence. Receive an authoritative summary, critical deadlines, and a fraud authenticity check in Gujarati, Hindi, or English.</p>
-    </div>
+    <!-- ── Landing Page Hero: Clean Title "Samjan" in Multilingual Typewriter ── -->
+    <section class="landing-hero">
+      <div class="hero-title-wrap">
+        <h1 class="hero-heading">
+          <span id="typewriter-text">Samjan</span><span class="typewriter-cursor">|</span>
+        </h1>
+      </div>
+
+      <p class="hero-description">
+        Understand every official document, bill, or government notice with clarity. Get clear plain-language explanations and instant fraud risk checks in Gujarati, Hindi, or English.
+      </p>
+
+      <div class="hero-cta-row">
+        <a href="#verifier-section" class="hero-cta-btn hero-cta-primary" id="cta-verify-btn">
+          <span>Verify a Document</span>
+          <span>↓</span>
+        </a>
+        <button type="button" class="hero-cta-btn hero-cta-secondary" id="hero-sample-btn">
+          Try Sample Electricity Bill
+        </button>
+      </div>
+    </section>
 
     {% if not has_key %}
     <div class="alert alert-err">
@@ -963,15 +1038,15 @@
     </div>
     {% endif %}
 
-    <!-- ── Submission Card ── -->
-    <div class="card">
+    <!-- ── Document Verifier Card ── -->
+    <div class="card" id="verifier-section">
       <div class="card-header-bar">
-        <span class="card-title">1. Document Details</span>
+        <span class="card-title">Document Verification Console</span>
       </div>
 
       <div class="form-row">
         <div class="form-group" style="margin-bottom:0;">
-          <label for="lang">Language for Explanation</label>
+          <label for="lang">Explanation Language</label>
           <select id="lang">
             <option value="Gujarati">ગુજરાતી (Gujarati)</option>
             <option value="Hindi">हिंदी (Hindi)</option>
@@ -991,7 +1066,7 @@
           <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg,image/webp" capture="environment" />
           <div class="drop-icon">📄</div>
           <div class="drop-title">Upload Document Photo or Paste (Ctrl+V)</div>
-          <div class="drop-hint">Supports clear camera photos, PNG, JPG, or PDF screenshots</div>
+          <div class="drop-hint">Supports camera photos, PNG, JPG, or PDF screenshots</div>
           <div id="file-badge-wrap" style="display:none;">
             <span class="file-badge" id="filename"></span>
           </div>
@@ -1069,7 +1144,7 @@
       <!-- Detailed Explanation -->
       <div class="card">
         <div class="card-header-bar">
-          <span class="card-title">2. Plain-Language Explanation</span>
+          <span class="card-title">Plain-Language Summary</span>
         </div>
         <div class="explanation-body" id="explanation-content"></div>
         <div class="official-disclaimer">
@@ -1080,7 +1155,7 @@
       <!-- Follow-up Inquiries -->
       <div id="chat-section" class="card">
         <div class="card-header-bar">
-          <span class="card-title">3. Document Inquiries</span>
+          <span class="card-title">Document Inquiries</span>
         </div>
         <div class="chat-history" id="chat-history"></div>
         <div class="chat-input-row">
@@ -1146,6 +1221,7 @@
   </main>
 
 <script>
+  // ── State ──────────────────────────────────────────────────────────────────
   let selectedFile   = null;
   let lastResult     = null;
   let speaking       = false;
@@ -1153,6 +1229,52 @@
   let currentAuthTab = 'login';
   let pendingExplain = false;
 
+  // ── "Samjan" Multilingual Typewriter Effect ────────────────────────────────
+  const words = [
+    "Samjan",       // English
+    "સમજણ",        // Gujarati
+    "समझ",          // Hindi
+    "समज",          // Marathi
+    "সমঝ",          // Bengali
+    "சம்ஜன்",       // Tamil
+    "ಸಮ್ಜನ್",      // Kannada
+    "సంజన్"        // Telugu
+  ];
+
+  let wordIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  const typeSpeed = 110;
+  const deleteSpeed = 65;
+  const pauseAfterWord = 2400;
+
+  function runTypewriter() {
+    const currentWord = words[wordIndex];
+    const textEl = document.getElementById('typewriter-text');
+
+    if (isDeleting) {
+      textEl.textContent = currentWord.substring(0, charIndex - 1);
+      charIndex--;
+    } else {
+      textEl.textContent = currentWord.substring(0, charIndex + 1);
+      charIndex++;
+    }
+
+    if (!isDeleting && charIndex === currentWord.length) {
+      isDeleting = true;
+      setTimeout(runTypewriter, pauseAfterWord);
+      return;
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      wordIndex = (wordIndex + 1) % words.length;
+      setTimeout(runTypewriter, 400);
+      return;
+    }
+
+    setTimeout(runTypewriter, isDeleting ? deleteSpeed : typeSpeed);
+  }
+
+  // ── DOM References ─────────────────────────────────────────────────────────
   const fileInput      = document.getElementById('file-input');
   const dropZone       = document.getElementById('drop-zone');
   const previewWrap    = document.getElementById('preview-wrap');
@@ -1162,6 +1284,8 @@
   const filenameEl     = document.getElementById('filename');
   const explainBtn     = document.getElementById('explain-btn');
   const sampleBtn      = document.getElementById('sample-btn');
+  const heroSampleBtn  = document.getElementById('hero-sample-btn');
+  const ctaVerifyBtn   = document.getElementById('cta-verify-btn');
   const resultSection  = document.getElementById('result-section');
   const savedToastWrap = document.getElementById('saved-toast-wrap');
 
@@ -1206,6 +1330,12 @@
   const drawerBackdrop = document.getElementById('drawer-backdrop');
   const closeDrawerBtn = document.getElementById('close-drawer-btn');
   const drawerList     = document.getElementById('drawer-list');
+
+  // Smooth scroll CTA
+  ctaVerifyBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('verifier-section').scrollIntoView({ behavior: 'smooth' });
+  });
 
   async function checkAuth() {
     try {
@@ -1344,7 +1474,6 @@
       }
 
       drawerList.innerHTML = docs.map(d => {
-        const riskClass = (d.scam_risk || 'low').toLowerCase();
         return `
           <div class="history-card" onclick="loadSavedDoc(${d.id})">
             <div class="history-top">
@@ -1439,20 +1568,24 @@
     filenameEl.textContent = '';
   });
 
-  sampleBtn.addEventListener('click', async () => {
+  async function loadSampleBill() {
     sampleBtn.disabled = true;
     sampleBtn.textContent = 'Loading Sample Bill...';
     try {
       const resp = await fetch('/sample');
       const blob = await resp.blob();
       handleFile(new File([blob], 'sample_electricity_bill.png', { type: 'image/png' }));
+      document.getElementById('verifier-section').scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       alert('Error fetching sample: ' + err.message);
     } finally {
       sampleBtn.disabled = false;
       sampleBtn.textContent = 'Load Sample Electricity Bill';
     }
-  });
+  }
+
+  sampleBtn.addEventListener('click', loadSampleBill);
+  heroSampleBtn.addEventListener('click', loadSampleBill);
 
   explainBtn.addEventListener('click', () => {
     if (!selectedFile) {
@@ -1568,8 +1701,8 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^#{1,3}\s+(.+)$/gm, '<strong style="color:var(--gold);font-size:1.05rem;display:block;margin-top:1.1rem;margin-bottom:0.35rem">$1</strong>')
-      .replace(/^(\d+)\.\s+/gm, '<br><strong style="color:var(--gold)">$1.</strong> ')
+      .replace(/^#{1,3}\s+(.+)$/gm, '<strong style="color:var(--accent-gold);font-size:1.05rem;display:block;margin-top:1.1rem;margin-bottom:0.35rem">$1</strong>')
+      .replace(/^(\d+)\.\s+/gm, '<br><strong style="color:var(--accent-gold)">$1.</strong> ')
       .replace(/^[-*]\s+/gm, '<br>• ')
       .replace(/\n/g, '<br>');
   }
@@ -1706,7 +1839,9 @@
     return bubble;
   }
 
+  // ── Initialize ─────────────────────────────────────────────────────────────
   checkAuth();
+  runTypewriter();
 </script>
 </body>
 </html>
