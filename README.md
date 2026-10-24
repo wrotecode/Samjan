@@ -1,96 +1,124 @@
-﻿# 📄 Samjan
+# Samjan
 
-> **Samjan** (સમજણ / समझ) means *understanding* in Gujarati and Hindi.
+Samjan (સમજણ / समझ) translates to *understanding* in Gujarati and Hindi.
 
-Upload a photo of any official letter, electricity bill, government notice or form.
-Get a clear explanation — **in Gujarati, Hindi or English** — in seconds.
-Powered by the open-weight **Gemma 4** model, running through the Gemini API.
+Samjan is a secure document verification and explanation platform. Users can upload scans or photographs of official letters, electricity bills, tax statements, and government notices to receive instant, plain-language explanations and fraud risk assessments in Gujarati, Hindi, or English.
 
----
-
-## ✨ What it does
-
-| Step | What happens |
-|------|-------------|
-| 1 | You upload a photo (PNG / JPG) of a document |
-| 2 | You pick a language and optionally ask a question |
-| 3 | Gemma 4 reads the image and follows the rules in `skills.md` |
-| 4 | You get a structured answer: what it is, key details, what to do, what to watch out for |
+The backend leverages Google DeepMind's open-weight Gemma 4 model via the Google GenAI SDK, with automated retry backoff, structured contract enforcement, and user document archiving.
 
 ---
 
-## 🚀 Quick start
+## Architecture and Core Capabilities
+
+- **Multilingual Document Intelligence:** Extracts classification, amounts, deadlines, and action items in Gujarati, Hindi, or English.
+- **Fraud and Tampering Detection:** Evaluates document authenticity, flagging urgency markers, suspicious payment routing, non-standard seals, or mismatched credentials.
+- **User Authentication and History:** Built-in session authentication backed by SQLite. Users can register and sign in to persist verified document records, review archived assessments, or remove records on demand.
+- **Interactive Document Inquiries:** Users can pose follow-up questions about specific clauses or payment deadlines directly against the scanned record.
+- **Calendar and Action Integration:** Generates RFC 5545 `.ics` calendar reminders for extracted deadlines, alongside text-to-speech accessibility and shareable verification digests.
+- **Resilient Model Pipeline:** Integrates automatic exponential backoff retries for transient upstream API responses, coupled with schema normalization defined in `skills.md`.
+
+---
+
+## Prerequisites
+
+- Python 3.10 or higher
+- A Google Gemini API key with access to Gemma 4 models (obtainable at [Google AI Studio](https://aistudio.google.com))
+
+---
+
+## Installation and Quick Start
+
+### 1. Clone the Repository
 
 ```bash
-# 1. Clone and enter the project
 git clone https://github.com/YOUR-USERNAME/Samjan.git
 cd Samjan
-
-# 2. Create a virtual environment
-python -m venv venv
-source venv/Scripts/activate   # Windows Git Bash
-# .\venv\Scripts\Activate.ps1  # Windows PowerShell
-# source venv/bin/activate      # macOS / Linux
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Add your Gemini API key
-echo "GEMINI_API_KEY=your_key_here" > .env
-# Get a free key at https://aistudio.google.com
-
-# 5. Run the app
-streamlit run app.py
 ```
 
-Open http://localhost:8501 in your browser.
+### 2. Set Up a Virtual Environment
+
+On Windows PowerShell:
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+On macOS / Linux:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMMA_MODEL=gemma-4-26b-a4b-it
+SECRET_KEY=your_session_secret_key_here
+```
+
+### 5. Launch the Application
+
+```bash
+python app.py
+```
+
+Open `http://127.0.0.1:5000` in your web browser.
 
 ---
 
-## 🔑 Environment variables
+## Configuration Reference
 
 | Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `GEMINI_API_KEY` | Yes | — | Your Gemini API key |
-| `GEMMA_MODEL` | No | `gemma-4-26b-a4b-it` | Override the Gemma 4 model name |
-
-Valid model names on the Gemini API: `gemma-4-26b-a4b-it`, `gemma-4-31b-it`.
-
----
-
-## 🧠 Open-weight model
-
-This project uses **Gemma 4**, an open-weight model published by Google DeepMind.
-The model weights are openly available, which means no vendor lock-in, reproducible
-results, and the ability to self-host (e.g. via Ollama) if needed.
-
-The assistant behaviour is defined in `skills.md` — a plain-text, human-readable
-skill file you can edit without touching any Python code.
+|---|---|---|---|
+| `GEMINI_API_KEY` | Yes | None | API key used for Google GenAI model calls |
+| `GEMMA_MODEL` | No | `gemma-4-26b-a4b-it` | Model identifier on the Gemini API |
+| `SECRET_KEY` | No | `samjan-secure-default-key-change-in-prod` | Secret key for Flask encrypted session cookies |
 
 ---
 
-## 📁 Project layout
+## Project Structure
 
 ```
 Samjan/
-├── app.py           # Streamlit UI + Gemini API call
-├── skills.md        # Agent skill: rules and output format for Gemma 4
-├── requirements.txt
-├── .env             # NOT committed — holds GEMINI_API_KEY
+├── app.py              # Flask server, GenAI integration, SQLite auth & document routes
+├── skills.md           # Model instruction contract and JSON extraction specification
+├── templates/
+│   └── index.html      # Responsive web console, auth modal, and history drawer
+├── requirements.txt    # Python runtime dependencies
+├── samjan.db           # Local SQLite database (auto-generated, git-ignored)
+├── .env.example        # Reference environment variables
 ├── .gitignore
-├── LICENSE          # MIT
+├── LICENSE
 └── README.md
 ```
 
 ---
 
-## ⚠️ Disclaimer
+## Verification Logic and Skills Specification
 
-This app explains what a document says. It does **not** give legal or financial advice.
-Always verify important details with the sender or an official office.
+The assistant's operational instructions, extraction schema, and fraud evaluation guidelines are codified in `skills.md`. This file defines:
+
+1. **Extraction Fields:** Document type, due amount, deadline date, formatted display date, fraud risk level (`LOW`, `MEDIUM`, `HIGH`), and specific reasons.
+2. **Translation Fidelity:** Rendering technical, municipal, and banking terms into clear, localized Gujarati, Hindi, or English without bureaucratic jargon.
+3. **Safety Fallbacks:** Clear notices distinguishing automated analysis from certified legal or fiscal advice.
 
 ---
 
-## 📜 License
+## Disclaimer
 
-MIT — see [LICENSE](LICENSE).
+Samjan is an automated document interpretation and verification assistant. It does not provide formal legal, tax, or financial advisory services. Critical legal documents, high-value invoices, or government penalties should always be verified directly with the issuing authority.
+
+---
+
+## License
+
+This project is distributed under the MIT License. See [LICENSE](LICENSE) for details.

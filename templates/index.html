@@ -957,6 +957,26 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    #verifier-section {
+      display: none;
+    }
+
+    #verifier-section.visible {
+      display: block;
+      animation: verifierFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes verifierFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     #result-section { display: none; }
     #chat-section { display: none; }
 
@@ -1286,6 +1306,7 @@
   const sampleBtn      = document.getElementById('sample-btn');
   const heroSampleBtn  = document.getElementById('hero-sample-btn');
   const ctaVerifyBtn   = document.getElementById('cta-verify-btn');
+  const verifierSection = document.getElementById('verifier-section');
   const resultSection  = document.getElementById('result-section');
   const savedToastWrap = document.getElementById('saved-toast-wrap');
 
@@ -1331,10 +1352,21 @@
   const closeDrawerBtn = document.getElementById('close-drawer-btn');
   const drawerList     = document.getElementById('drawer-list');
 
-  // Smooth scroll CTA
+  function showVerifierSection(shouldScroll = true) {
+    if (!verifierSection.classList.contains('visible')) {
+      verifierSection.classList.add('visible');
+    }
+    if (shouldScroll) {
+      setTimeout(() => {
+        verifierSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }
+  }
+
+  // Reveal verifier section on "Verify a Document" click
   ctaVerifyBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('verifier-section').scrollIntoView({ behavior: 'smooth' });
+    showVerifierSection(true);
   });
 
   async function checkAuth() {
@@ -1495,6 +1527,7 @@
 
   window.loadSavedDoc = async function(id) {
     closeDrawer();
+    showVerifierSection(false);
     try {
       const resp = await fetch(`/history/${id}`);
       const data = await resp.json();
@@ -1505,6 +1538,7 @@
       lastResult = data;
       renderResult(data);
       savedToastWrap.style.display = 'block';
+      resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (e) {
       alert('Could not load record: ' + e.message);
     }
@@ -1569,13 +1603,14 @@
   });
 
   async function loadSampleBill() {
+    showVerifierSection(true);
     sampleBtn.disabled = true;
     sampleBtn.textContent = 'Loading Sample Bill...';
     try {
       const resp = await fetch('/sample');
       const blob = await resp.blob();
       handleFile(new File([blob], 'sample_electricity_bill.png', { type: 'image/png' }));
-      document.getElementById('verifier-section').scrollIntoView({ behavior: 'smooth' });
+      verifierSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
       alert('Error fetching sample: ' + err.message);
     } finally {
