@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samjan — Document Explainer</title>
+  <meta name="description" content="Upload a photo of any letter, bill or form and get a simple explanation in Gujarati, Hindi or English. Powered by open-weight Gemma 4." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0f1a;
+      --surface: #161929;
+      --card: #1e2236;
+      --border: #2a2f4a;
+      --accent: #7c6fff;
+      --accent2: #a78bfa;
+      --accent3: #38bdf8;
+      --text: #e8eaf6;
+      --muted: #7b83b0;
+      --success: #34d399;
+      --warn: #fbbf24;
+      --err: #f87171;
+      --risk-low: #34d399;
+      --risk-med: #fbbf24;
+      --risk-high: #f87171;
+      --radius: 14px;
+      --shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 6rem;
+    }
+    a { color: var(--accent2); }
+
+    /* ── Layout ── */
+    .container { max-width: 680px; margin: 0 auto; }
+
+    /* ── Header ── */
+    header { text-align: center; margin-bottom: 2.5rem; }
+    header h1 {
+      font-size: 2.6rem; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent2) 0%, var(--accent3) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    header p { color: var(--muted); margin-top: .4rem; font-size: .95rem; line-height: 1.6; }
+    .badge {
+      display: inline-block; margin-top: .65rem; font-size: .72rem; font-weight: 600;
+      color: var(--accent2); border: 1px solid var(--border); border-radius: 999px;
+      padding: .22rem .75rem; background: rgba(124,111,255,.1); letter-spacing: .04em; text-transform: uppercase;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem; margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Form elements ── */
+    label {
+      display: block; font-size: .78rem; font-weight: 600; color: var(--muted);
+      margin-bottom: .35rem; letter-spacing: .06em; text-transform: uppercase;
+    }
+    select, input[type="text"] {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); padding: .65rem .9rem;
+      font-size: .95rem; font-family: inherit; outline: none;
+      transition: border-color .2s; margin-bottom: 1.2rem;
+    }
+    select:focus, input[type="text"]:focus { border-color: var(--accent); }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 2.5rem 1rem; text-align: center; cursor: pointer;
+      transition: border-color .2s, background .2s; position: relative; margin-bottom: 1.2rem;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(124,111,255,.06); }
+    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .drop-zone .icon { font-size: 2rem; margin-bottom: .5rem; }
+    .drop-zone p { color: var(--muted); font-size: .9rem; }
+    .drop-zone .filename { color: var(--accent2); font-size: .82rem; margin-top: .4rem; font-weight: 500; }
+
+    #preview-wrap { display: none; margin-bottom: 1.2rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    #preview-wrap img { width: 100%; display: block; max-height: 340px; object-fit: contain; background: #111; }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%; padding: .85rem; border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: opacity .2s, transform .1s;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; }
+    .btn-secondary {
+      background: var(--card); color: var(--muted); border: 1px solid var(--border);
+      margin-top: .6rem; font-size: .85rem; padding: .65rem;
+    }
+    .btn-sm {
+      padding: .5rem .9rem; border-radius: 8px; font-size: .82rem; font-weight: 600;
+      border: 1px solid var(--border); background: var(--card); color: var(--text);
+      cursor: pointer; transition: background .15s, border-color .15s; font-family: inherit;
+    }
+    .btn-sm:hover { background: var(--border); border-color: var(--accent); }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block; width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,.25); border-top-color: #fff;
+      border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: .5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Dashboard cards ── */
+    .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; margin-bottom: 1.25rem; }
+    .dash-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1rem .9rem; text-align: center;
+    }
+    .dash-card .label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .4rem; }
+    .dash-card .value { font-size: 1.05rem; font-weight: 700; color: var(--text); word-break: break-word; }
+    .dash-card .value.amount { color: var(--warn); }
+    .dash-card .value.deadline { color: var(--accent3); }
+
+    /* ── Scam badge ── */
+    .scam-box {
+      border-radius: 10px; padding: .85rem 1.1rem; margin-bottom: 1.25rem;
+      display: flex; align-items: flex-start; gap: .75rem;
+    }
+    .scam-box.low  { background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.3); }
+    .scam-box.medium { background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.3); }
+    .scam-box.high { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.35); }
+    .scam-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .scam-label { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .3rem; }
+    .scam-box.low  .scam-label { color: var(--risk-low); }
+    .scam-box.medium .scam-label { color: var(--risk-med); }
+    .scam-box.high .scam-label { color: var(--risk-high); }
+    .scam-reasons { font-size: .85rem; color: var(--muted); line-height: 1.55; }
+    .scam-reasons li { list-style: none; padding-left: .8rem; position: relative; }
+    .scam-reasons li::before { content: "·"; position: absolute; left: 0; }
+
+    /* ── Action bar ── */
+    .action-bar { display: flex; gap: .65rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .action-bar .btn-sm { flex: 1; min-width: 100px; text-align: center; }
+
+    /* ── Explanation ── */
+    .explanation { font-size: .95rem; line-height: 1.8; color: var(--text); }
+    .explanation strong { color: #fff; }
+    .explanation br + strong, .explanation p strong { color: var(--accent2); }
+    .disclaimer { margin-top: 1rem; font-size: .78rem; color: var(--muted); }
+
+    /* ── Chat ── */
+    .chat-history {
+      max-height: 320px; overflow-y: auto; margin-bottom: 1rem;
+      display: flex; flex-direction: column; gap: .75rem;
+    }
+    .chat-msg { border-radius: 10px; padding: .7rem .95rem; font-size: .9rem; line-height: 1.6; max-width: 88%; }
+    .chat-msg.user { background: rgba(124,111,255,.15); border: 1px solid rgba(124,111,255,.3); align-self: flex-end; }
+    .chat-msg.bot  { background: var(--card); border: 1px solid var(--border); align-self: flex-start; }
+    .chat-input-row { display: flex; gap: .6rem; }
+    .chat-input-row input {
+      flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: .6rem .85rem; font-size: .9rem; font-family: inherit; outline: none;
+    }
+    .chat-input-row input:focus { border-color: var(--accent); }
+    .chat-input-row button {
+      padding: .6rem 1.1rem; border-radius: 8px; border: none;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff;
+      font-weight: 600; font-size: .9rem; cursor: pointer; font-family: inherit;
+      transition: opacity .2s;
+    }
+    .chat-input-row button:disabled { opacity: .5; }
+
+    /* ── Alert ── */
+    .alert { border-radius: 8px; padding: .75rem 1rem; font-size: .9rem; }
+    .alert-err { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); color: var(--err); }
+
+    /* ── No key banner ── */
+    .no-key-banner {
+      background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.3);
+      color: var(--err); border-radius: 10px; padding: 1rem 1.25rem;
+      font-size: .9rem; margin-bottom: 1.5rem;
+    }
+    .no-key-banner code { background: rgba(0,0,0,.3); border-radius: 4px; padding: .1rem .4rem; }
+
+    #result-section { display: none; }
+    #chat-section { display: none; margin-top: 1.25rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>📄 Samjan</h1>
+    <p>Photo of a letter, bill or form in.<br>Simple explanation out, in your language.</p>
+    <span class="badge">Powered by open-weight Gemma 4</span>
+  </header>
+
+  {% if not has_key %}
+  <div class="no-key-banner">
+    <strong>⚠ API key not found.</strong> Create a <code>.env</code> file with
+    <code>GEMINI_API_KEY=your_key</code> and restart.
+    Get a free key at <a href="https://aistudio.google.com">aistudio.google.com</a>.
+  </div>
+  {% endif %}
+
+  <!-- ── Upload card ── -->
+  <div class="card">
+    <label for="lang">Explain in</label>
+    <select id="lang">
+      <option>Gujarati</option>
+      <option>Hindi</option>
+      <option selected>English</option>
+    </select>
+
+    <label for="question">Optional question</label>
+    <input type="text" id="question" placeholder="e.g. How much do I owe?" />
+
+    <label>Document photo</label>
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg" />
+      <div class="icon">📎</div>
+      <p>Drop a photo here or click to browse</p>
+      <div class="filename" id="filename"></div>
+    </div>
+
+    <div id="preview-wrap"><img id="preview" src="" alt="Preview" /></div>
+
+    <button class="btn btn-primary" id="explain-btn" {% if not has_key %}disabled{% endif %}>
+      Explain this document
+    </button>
+    <button class="btn btn-secondary" id="sample-btn">Try a sample electricity bill</button>
+  </div>
+
+  <!-- ── Results ── -->
+  <div id="result-section">
+
+    <!-- Dashboard cards -->
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="label">Document type</div>
+        <div class="value" id="dash-type">—</div>
+      </div>
+      <div class="dash-card">
+        <div class="label">Amount due</div>
+        <div class="value amount" id="dash-amount">—</div>
+      </div>
+      <div class="dash-card">
+        <div class="label">Deadline</div>
+        <div class="value deadline" id="dash-deadline">—</div>
+      </div>
+    </div>
+
+    <!-- Scam risk -->
+    <div class="scam-box" id="scam-box">
+      <div class="scam-icon" id="scam-icon">🛡️</div>
+      <div>
+        <div class="scam-label" id="scam-label">Scam risk</div>
+        <ul class="scam-reasons" id="scam-reasons"></ul>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <button class="btn-sm" id="speak-btn">🔊 Read aloud</button>
+      <button class="btn-sm" id="ics-btn" disabled>📅 Add to calendar</button>
+      <button class="btn-sm" id="wa-btn">📱 WhatsApp share</button>
+    </div>
+
+    <!-- Full explanation -->
+    <div class="card">
+      <div class="explanation" id="explanation-content"></div>
+      <p class="disclaimer">⚠️ AI can make mistakes. Check important details with the sender or an official office.</p>
+    </div>
+
+    <!-- Follow-up chat -->
+    <div id="chat-section" class="card">
+      <label style="margin-bottom:.85rem;display:block;font-size:.85rem;color:var(--accent2);font-weight:600;">
+        💬 Ask a follow-up question
+      </label>
+      <div class="chat-history" id="chat-history"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="Can I pay online? What if I miss the date?" />
+        <button id="chat-send" disabled>Send</button>
+      </div>
+    </div>
+
+  </div><!-- /result-section -->
+
+</div><!-- /container -->
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let selectedFile = null;
+  let lastResult   = null;   // full JSON from /explain
+  let speaking     = false;
+
+  // ── DOM refs ───────────────────────────────────────────────────────────────
+  const fileInput      = document.getElementById('file-input');
+  const dropZone       = document.getElementById('drop-zone');
+  const preview        = document.getElementById('preview');
+  const previewWrap    = document.getElementById('preview-wrap');
+  const filenameEl     = document.getElementById('filename');
+  const explainBtn     = document.getElementById('explain-btn');
+  const sampleBtn      = document.getElementById('sample-btn');
+  const resultSection  = document.getElementById('result-section');
+
+  const dashType     = document.getElementById('dash-type');
+  const dashAmount   = document.getElementById('dash-amount');
+  const dashDeadline = document.getElementById('dash-deadline');
+  const scamBox      = document.getElementById('scam-box');
+  const scamIcon     = document.getElementById('scam-icon');
+  const scamLabel    = document.getElementById('scam-label');
+  const scamReasons  = document.getElementById('scam-reasons');
+  const exContent    = document.getElementById('explanation-content');
+
+  const speakBtn = document.getElementById('speak-btn');
+  const icsBtn   = document.getElementById('ics-btn');
+  const waBtn    = document.getElementById('wa-btn');
+
+  const chatSection = document.getElementById('chat-section');
+  const chatHistory = document.getElementById('chat-history');
+  const chatInput   = document.getElementById('chat-input');
+  const chatSend    = document.getElementById('chat-send');
+
+  // ── Drag-and-drop ──────────────────────────────────────────────────────────
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+  function handleFile(file) {
+    if (!file) return;
+    selectedFile = file;
+    filenameEl.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = e => { preview.src = e.target.result; previewWrap.style.display = 'block'; };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Sample bill ────────────────────────────────────────────────────────────
+  sampleBtn.addEventListener('click', async () => {
+    const resp = await fetch('/sample');
+    const blob = await resp.blob();
+    handleFile(new File([blob], 'sample_bill.png', { type: 'image/png' }));
+  });
+
+  // ── Explain ────────────────────────────────────────────────────────────────
+  explainBtn.addEventListener('click', async () => {
+    if (!selectedFile) { alert('Please upload or select a document photo first.'); return; }
+    setLoading(true);
+    resultSection.style.display = 'none';
+    chatSection.style.display = 'none';
+
+    const form = new FormData();
+    form.append('image', selectedFile);
+    form.append('lang', document.getElementById('lang').value);
+    form.append('question', document.getElementById('question').value);
+
+    try {
+      const resp = await fetch('/explain', { method: 'POST', body: form });
+      const data = await resp.json();
+      if (data.error) {
+        showError(data.error); return;
+      }
+      lastResult = data;
+      renderResult(data);
+    } catch (e) {
+      showError('Network error: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  function setLoading(on) {
+    explainBtn.disabled = on;
+    explainBtn.innerHTML = on ? '<span class="spinner"></span>Reading the document…' : 'Explain this document';
+  }
+
+  function showError(msg) {
+    resultSection.style.display = 'block';
+    exContent.innerHTML = `<div class="alert alert-err">${msg}</div>`;
+    dashType.textContent = dashAmount.textContent = dashDeadline.textContent = '—';
+    scamBox.className = 'scam-box low';
+    scamReasons.innerHTML = '';
+  }
+
+  // ── Render result ──────────────────────────────────────────────────────────
+  function renderResult(d) {
+    // Dashboard cards
+    dashType.textContent     = d.type     || '—';
+    dashAmount.textContent   = d.amount   || '—';
+    dashDeadline.textContent = d.deadline_display || d.deadline || '—';
+
+    // Scam box
+    const risk = (d.scam_risk || 'low').toLowerCase();
+    const icons = { low: '🛡️', medium: '⚠️', high: '🚨' };
+    const labels = { low: 'Low scam risk', medium: 'Medium scam risk', high: 'High scam risk — be careful!' };
+    scamBox.className = 'scam-box ' + risk;
+    scamIcon.textContent = icons[risk] || '🛡️';
+    scamLabel.textContent = labels[risk] || 'Scam risk';
+    scamReasons.innerHTML = (d.scam_reasons || []).map(r => `<li>${r}</li>`).join('');
+
+    // Explanation
+    exContent.innerHTML = md(d.explanation || '');
+
+    // Action buttons
+    icsBtn.disabled = !d.deadline || d.deadline === 'N/A';
+    waBtn.onclick = () => shareWhatsApp(d);
+    icsBtn.onclick = () => downloadIcs(d);
+
+    resultSection.style.display = 'block';
+    chatSection.style.display = 'block';
+    chatSend.disabled = false;
+    chatHistory.innerHTML = '';
+    resultSection.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ── Minimal Markdown renderer ──────────────────────────────────────────────
+  function md(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^#{1,3}\s+(.+)$/gm, '<strong style="color:var(--accent2);font-size:1rem;display:block;margin-top:.85rem;margin-bottom:.3rem">$1</strong>')
+      .replace(/^(\d+)\.\s+/gm, '<br><strong style="color:var(--accent2)">$1.</strong> ')
+      .replace(/^[-*]\s+/gm, '<br>• ')
+      .replace(/\n/g, '<br>');
+  }
+
+  // ── Read aloud (Web Speech API) ────────────────────────────────────────────
+  speakBtn.addEventListener('click', () => {
+    if (!lastResult) return;
+    if (speaking) { speechSynthesis.cancel(); speaking = false; speakBtn.textContent = '🔊 Read aloud'; return; }
+
+    const lang = document.getElementById('lang').value;
+    const langMap = { Gujarati: 'gu-IN', Hindi: 'hi-IN', English: 'en-IN' };
+    const plainText = (lastResult.explanation || '').replace(/<[^>]+>/g, '').replace(/[*#`]/g, '');
+
+    const utt = new SpeechSynthesisUtterance(plainText);
+    utt.lang = langMap[lang] || 'en-IN';
+    // Try to find a matching voice
+    const voices = speechSynthesis.getVoices();
+    const match = voices.find(v => v.lang.startsWith(utt.lang.slice(0,2)));
+    if (match) utt.voice = match;
+    utt.rate = 0.92;
+    utt.onend = () => { speaking = false; speakBtn.textContent = '🔊 Read aloud'; };
+    utt.onerror = () => { speaking = false; speakBtn.textContent = '🔊 Read aloud'; };
+
+    speechSynthesis.speak(utt);
+    speaking = true;
+    speakBtn.textContent = '⏹ Stop reading';
+  });
+
+  // ── Calendar .ics ──────────────────────────────────────────────────────────
+  async function downloadIcs(d) {
+    const resp = await fetch('/ics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deadline: d.deadline, type: d.type, amount: d.amount })
+    });
+    if (!resp.ok) { alert('Could not create calendar file.'); return; }
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'reminder.ics'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── WhatsApp share ─────────────────────────────────────────────────────────
+  function shareWhatsApp(d) {
+    const plain = (d.explanation || '').replace(/<[^>]+>/g, '').replace(/[*#`]/g, '').trim();
+    const msg = `📄 *${d.type}*\n💰 Amount: ${d.amount}\n📅 Deadline: ${d.deadline_display || d.deadline}\n🛡️ Scam risk: ${d.scam_risk}\n\n${plain.slice(0, 600)}…\n\n_Explained by Samjan (Gemma 4)_`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  }
+
+  // ── Follow-up chat ─────────────────────────────────────────────────────────
+  chatSend.addEventListener('click', sendChat);
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+  async function sendChat() {
+    const q = chatInput.value.trim();
+    if (!q || !lastResult) return;
+
+    appendMsg(q, 'user');
+    chatInput.value = '';
+    chatSend.disabled = true;
+
+    const thinkEl = appendMsg('…', 'bot');
+
+    try {
+      const resp = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lang: document.getElementById('lang').value,
+          context: lastResult.explanation || '',
+          question: q
+        })
+      });
+      const data = await resp.json();
+      thinkEl.innerHTML = md(data.answer || data.error || 'No response.');
+    } catch (e) {
+      thinkEl.innerHTML = 'Network error: ' + e.message;
+    } finally {
+      chatSend.disabled = false;
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+  }
+
+  function appendMsg(text, role) {
+    const el = document.createElement('div');
+    el.className = 'chat-msg ' + role;
+    el.innerHTML = text;
+    chatHistory.appendChild(el);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    return el;
+  }
+</script>
+</body>
+</html>
